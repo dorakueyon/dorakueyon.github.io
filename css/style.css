@@ -78,8 +78,8 @@ body {
 	font-feature-settings: 'liga' 1;
 }
 
-div.content { 
-	display: block; 
+div.content {
+	display: block;
 	padding: 4rem 0 1rem 0;
 }
 
@@ -94,7 +94,7 @@ footer {
 }
 
 @media all and (max-width:520px) {
-	div.content { 
+	div.content {
 		padding: 0;
 	}
 }
@@ -113,6 +113,25 @@ h1 {
 	hyphens: none;
 }
 
+h2{
+    font-weight: 700;
+    color: #555;
+    border-bottom: 1px solid #e5e5e5;
+    margin-top: 60px;
+    margin-bottom: 30px;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+h3{
+    color: #555;
+    font-weight: 700;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    position: relative;
+    padding-bottom: 10px;
+}
+
 aside {
 	font-size: 0.84rem;
 	line-height: 1.40;
@@ -127,6 +146,8 @@ aside em {
 p {
 	margin-bottom: 1em;
 	line-height: 1.45;
+    color: #555;
+    margin: 0 0 1.5em;
 }
 
 ul,ol {
@@ -137,11 +158,19 @@ ul,ol {
 li {
 	line-height: 1.75em;
 	margin-left: 0.75em;
-	list-style-type: none;
+    margin-bottom: 0.5em;
+}
+
+ul li {
+	list-style-type: disc;
+}
+
+ol li {
+	list-style-type: decimal;
 }
 
 
-table { 
+table {
 	margin-bottom: 1.5em;
 	border-collapse: collapse;
 	width: 95%;
@@ -174,6 +203,7 @@ table th {
 
 img {
 	width: 100%;
+    vertical-align: middle;
 }
 
 a {
@@ -188,11 +218,11 @@ a {
 }
 
 
-div.nav a:active div { 
+div.nav a:active div {
 	background: #cacaca;
 }
 
-a:active { 
+a:active {
 	color: #2a6496;
 }
 
@@ -233,9 +263,10 @@ figcaption {
 }
 
 blockquote {
-	border-left: 3.5px solid #0594cb;
-	margin: 0.7em 10px;
-	padding: 0.7em 20px;
+    border-left: 4px solid #eee;
+    padding-left: 2em;
+    font-style: italic;
+    margin: 2em 0;
 
 }
 
