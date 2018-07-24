@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Posts on dorakueyon</title>
-    <link>https://dorakueyon.github.io/posts/</link>
+    <link>https://dorakueyon.com/posts/</link>
     <description>Recent content in Posts on dorakueyon</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja-jp</language>
@@ -11,15 +11,15 @@
     <copyright>Copyright (C) 2018-2018 Yohei Iguchi All Right Reserved.</copyright>
     <lastBuildDate>Mon, 23 Jul 2018 22:17:39 +0900</lastBuildDate>
     
-        <atom:link href="https://dorakueyon.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+        <atom:link href="https://dorakueyon.com/posts/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>HelloWorld</title>
-      <link>https://dorakueyon.github.io/posts/sample/</link>
+      <link>https://dorakueyon.com/posts/sample/</link>
       <pubDate>Mon, 23 Jul 2018 22:17:39 +0900</pubDate>
       <author>matthew.at.muse@gmail.com (Yohei Iguchi)</author>
-      <guid>https://dorakueyon.github.io/posts/sample/</guid>
+      <guid>https://dorakueyon.com/posts/sample/</guid>
       <description>&lt;p&gt;initial commit&lt;/p&gt;
 </description>
     </item>
