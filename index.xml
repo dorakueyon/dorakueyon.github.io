@@ -9,10 +9,146 @@
     <managingEditor>matthew.at.muse@gmail.com (Yohei Iguchi)</managingEditor>
     <webMaster>matthew.at.muse@gmail.com (Yohei Iguchi)</webMaster>
     <copyright>Copyright (C) 2018-2018 Yohei Iguchi All Right Reserved.</copyright>
-    <lastBuildDate>Mon, 23 Jul 2018 22:17:39 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 24 Jul 2018 21:42:02 +0900</lastBuildDate>
     
         <atom:link href="https://dorakueyon.com/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Hugo &#43; Gihub &#43; 独自ドメイン(お名前.com) でSSLな話し</title>
+      <link>https://dorakueyon.com/posts/hugogithuboriginaldomainssl/</link>
+      <pubDate>Tue, 24 Jul 2018 21:42:02 +0900</pubDate>
+      <author>matthew.at.muse@gmail.com (Yohei Iguchi)</author>
+      <guid>https://dorakueyon.com/posts/hugogithuboriginaldomainssl/</guid>
+      <description>
+
+&lt;p&gt;題名通り、新たにHugoを使ったブログを作るときに利用したサイトとかをメモ.&lt;/p&gt;
+
+&lt;p&gt;そもそもブログを作るに至った経緯はまた別の話し.&lt;/p&gt;
+
+&lt;h2 id=&#34;hugo&#34;&gt;Hugo&lt;/h2&gt;
+
+&lt;h3 id=&#34;導入&#34;&gt;導入&lt;/h3&gt;
+
+&lt;p&gt;Hugoの導入(ローカルでserver動かしてWebブラウザでみるところまで)は特にハマりどころなし.
+お好きな記事でどうぞ.&lt;/p&gt;
+
+&lt;h3 id=&#34;デザインの選定&#34;&gt;デザインの選定&lt;/h3&gt;
+
+&lt;p&gt;ここは沼にハマると一番時間がかかる部分.
+Hugoの見た目は基本下記3パターンのアプローチがある.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;ふろむフルスクラッチ&lt;/li&gt;
+&lt;li&gt;既存のThemeを利用してそのまま利用&lt;/li&gt;
+&lt;li&gt;既存のThemeを利用しつつ上書き修正&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;1.はまずHugo初級者からすると下調べから時間かかるので却下。
+ということで普通の人は2.か3.にいきつくと思う.&lt;/p&gt;
+
+&lt;p&gt;結論、3. にならざるおえないかな.&lt;/p&gt;
+
+&lt;p&gt;まずは2.で落ち着けるか下記の公式を巡回&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://themes.gohugo.io/&#34;&gt;Complete List | Hugo Themes&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;400近いThemesから自分の理想なThe Oneを見つけるのは胸が苦しくなったのでいくつかのランキング系まとめサイトに逃げた.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://discourse.gohugo.io/t/theme-recommendations/5816/5&#34;&gt;Theme recommendations - support - Hugo Discussion&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://terrty.net/2018/15-hugo-framework-blog-themes/&#34;&gt;15 Hugo Framework blog themes - Notes on Blue Skies&lt;/a&gt;)]&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;欲しかったのはシンプル/ミニマリスティックなやつ.
+結局200近くくらい見比べつつ適当に手元にcloneしながら確認しつつ、最終的に下記のThemeに決めた&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://themes.gohugo.io/hugo-theme-one/&#34;&gt;Hugo Theme One | Hugo Themes&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;その名も&amp;rdquo;One&amp;rdquo;.
+そう、まさに僕だけのThe Oneだね.&lt;/p&gt;
+
+&lt;p&gt;ただ英語が基本のデザインなのか、自分の狙う感じのデザインには若干ずれてる. ちょっとそれじゃない感が要所要所にある感じ.&lt;/p&gt;
+
+&lt;p&gt;そうすると気になるところからHTML/CSS修正したくなってしまい、結局多少デザインいじることに.&lt;/p&gt;
+
+&lt;p&gt;差分は下記のような感じ.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ diff -r ./layouts ./themes/one/layouts | grep -E &#39;^[\+|-]\s&#39; | wc -l
+      26
+
+$ diff -r ./static/css ./themes/one/static/css | grep -E &#39;^[\+|-]\s&#39; | wc -l
+      61
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;html系が26行前後、cssが61行言語修正した. (加筆修正含む)
+こうしてみると100行以下修正するだけで個人的に満足いくデザインになるのは嬉しい.&lt;/p&gt;
+
+&lt;p&gt;ちなみに今回初めて知った名詞でblog-card|ブログカードというものがあって、なんてことはないはてぶとかでよく見るやつ
+↓これ
+&lt;iframe
+  class=&#34;hatenablogcard&#34;
+  style=&#34;width:100%;height:155px;max-width:420px;&#34;
+  src=&#34;https://hatenablog-parts.com/embed?url=https%3a%2f%2fgithub.com%2fdorakueyon&#34;
+  title=&#34;&#34;
+  width=&#34;300&#34;
+  height=&#34;150&#34;
+  frameborder=&#34;0&#34;
+  scrolling=&#34;no&#34;&gt;
+&lt;/iframe&gt;
+&lt;/p&gt;
+
+&lt;p&gt;ライトな記法で↑みたいに展開するために、layouts配下に新規にshortcodesフォルダを追加して、他の方々のやつを参考に自分でも使わせていただいた.&lt;/p&gt;
+
+&lt;p&gt;あまり使いすぎるとHugo以外に移行するときに移行スクリプトの作成が必要になるかな. という不安も拭えないのであまり種類ふやさず運用していこう.&lt;/p&gt;
+
+&lt;p&gt;ここまででとりあえずローカル上で動くところまでおわる.&lt;/p&gt;
+
+&lt;h2 id=&#34;github&#34;&gt;Github&lt;/h2&gt;
+
+&lt;h3 id=&#34;導入-1&#34;&gt;導入&lt;/h3&gt;
+
+&lt;p&gt;ここも特に難しい所はないはずなので、特に記載はしません.&lt;/p&gt;
+
+&lt;p&gt;ここまででとりあえずWeb上で動くところまでおわる.
+そしてこの時点でSSL対応も完了しているのでとりあえずサイトをWebに公開したい、っていう人はここまで.&lt;/p&gt;
+
+&lt;p&gt;ただしドメインはgithub.io&lt;/p&gt;
+
+&lt;p&gt;ベンダーロックインは死んでもするなと死んだおじいさんに言われているので、感動も冷めやらぬまま独自ドメインの設定に.&lt;/p&gt;
+
+&lt;h2 id=&#34;独自ドメイン&#34;&gt;独自ドメイン&lt;/h2&gt;
+
+&lt;p&gt;ドメインを持っていなければまずは取得ということになる.
+これは正直なんでもよい。&lt;/p&gt;
+
+&lt;p&gt;ムーム? ディグネーション？とか色々あるけどやはり日本語名称の安心感から&lt;a href=&#34;https://www.onamae.com&#34;&gt;お名前.com&lt;/a&gt;を利用.&lt;/p&gt;
+
+&lt;p&gt;ここからSSLを見越したDSNの設定をしていく.&lt;/p&gt;
+
+&lt;h2 id=&#34;またまたgithub-ssl化&#34;&gt;またまたGithub (SSL化)&lt;/h2&gt;
+
+&lt;p&gt;SSLにしようと色々とCloudFrontとか使って頑張ろうとしたんだけど、結局Github側でgithub.ioのSSL化まで対応されていた.(2018年2月ごろより)&lt;/p&gt;
+
+&lt;p&gt;CloudFrontにNSむけてしまっていたがシンプルな構成にするためにGithub側でのSSL化をすることに.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://qiita.com/foobaron/items/cd9cfc403defa706372b&#34;&gt;GitHub Pages + 独自ドメイン + HTTPS (SSL) のサポートをGitHubが提供開始 - Qiita&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;ここらへんを参考に、ドメイン管理サイト側でAレコードを設定していく.&lt;/p&gt;
+
+&lt;p&gt;設定は完了したのだがTTLが標準のままだったようなので各所のDNSサーバーに新Aレコード設定が染み渡るのは時間がかかるようでまだサイトへの疎通が確認できていない.&lt;/p&gt;
+
+&lt;p&gt;ちなみに&amp;rdquo;染み出す&amp;rdquo;というワードを使う人が現職で多いのだけど、使うのが恥ずかしくて意識をしないと口からでてこない.&lt;/p&gt;
+
+&lt;p&gt;以上です.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>HelloWorld</title>
