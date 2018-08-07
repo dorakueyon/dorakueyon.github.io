@@ -9,10 +9,97 @@
     <managingEditor>matthew.at.muse@gmail.com (Yohei Iguchi)</managingEditor>
     <webMaster>matthew.at.muse@gmail.com (Yohei Iguchi)</webMaster>
     <copyright>Copyright (C) 2018-2018 Yohei Iguchi All Right Reserved.</copyright>
-    <lastBuildDate>Tue, 24 Jul 2018 21:42:02 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 07 Aug 2018 22:43:32 +0900</lastBuildDate>
     
         <atom:link href="https://dorakueyon.com/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>BlockchainをGoを使って学ぶ (或いはGoをBlockChainを使って学ぶ)</title>
+      <link>https://dorakueyon.com/posts/blockchainwithgo/</link>
+      <pubDate>Tue, 07 Aug 2018 22:43:32 +0900</pubDate>
+      <author>matthew.at.muse@gmail.com (Yohei Iguchi)</author>
+      <guid>https://dorakueyon.com/posts/blockchainwithgo/</guid>
+      <description>
+
+&lt;h2 id=&#34;はじめに&#34;&gt;はじめに&lt;/h2&gt;
+
+&lt;p&gt;Goを使って何かがしたい. という気持ちと、Blockchainを学んでみたい、という気持ちが交差した.&lt;/p&gt;
+
+&lt;p&gt;今回はいたって平凡な取り組みとなるが、Goを使ったBlockchainの実装を紹介.&lt;/p&gt;
+
+&lt;p&gt;参考にしたのはQiitaでバズっていた下記記事&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://qiita.com/hidehiro98/items/841ece65d896aeaa8a2a&#34;&gt;ブロックチェーンを作ることで学ぶ 〜ブロックチェーンがどのように動いているのか学ぶ最速の方法は作ってみることだ〜 - Qiita&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;上記は下記の翻訳記事&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://hackernoon.com/learn-blockchains-by-building-one-117428612f46&#34;&gt;Learn Blockchains by Building One – Hacker Noon&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;先人の肩の上に乗らせていただく.
+感謝しかない.&lt;/p&gt;
+
+&lt;p&gt;謝謝nagaoka先生.&lt;/p&gt;
+
+&lt;h2 id=&#34;goを使ってblockchain実装する際に感じたこと&#34;&gt;Goを使ってBlockChain実装する際に感じたこと&lt;/h2&gt;
+
+&lt;p&gt;GitHubのRepositoryは下記です.&lt;/p&gt;
+
+&lt;iframe
+  class=&#34;hatenablogcard&#34;
+  style=&#34;width:100%;height:155px;max-width:420px;&#34;
+  src=&#34;https://hatenablog-parts.com/embed?url=https%3a%2f%2fgithub.com%2fdorakueyon%2fgochain&#34;
+  title=&#34;&#34;
+  width=&#34;300&#34;
+  height=&#34;150&#34;
+  frameborder=&#34;0&#34;
+  scrolling=&#34;no&#34;&gt;
+&lt;/iframe&gt;
+
+
+&lt;p&gt;ディレクトリの構成としては&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;├── blockchain
+│   ├── blockchain.go
+│   ├── blockchain_test.go
+│   ├── model.go
+│   ├── proof.go
+│   └── validation.go
+├── data
+│   └── blockchain.data
+├── main.go
+└── server
+    ├── server.go
+    └── server_test.go
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;こんな感じになっています.&lt;/p&gt;
+
+&lt;p&gt;基本、Blockchain関連の処理はblockchainフォルダ、Web Serverを立てたりエンドポイント毎に処理を切り分けたりする処理をserverフォルダにいれています.&lt;/p&gt;
+
+&lt;p&gt;データのやりとりのところを少してこづりまして、本家の実装(python)だと、全てメモリ上で完結(インスタンス化したblockchainクラスの中で処理が完結)していたので、Goでもと思ったのですが、ポインタをWeb Serverにうまく受け渡しができませんでした.&lt;/p&gt;
+
+&lt;p&gt;デモレベルでDB入れるのもなんだったので、最終的に&lt;a href=&#34;https://golang.org/pkg/encoding/gob/&#34;&gt;gob&lt;/a&gt;を利用しています.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://qiita.com/delphinus/items/67a796cb7876132a1ec0&#34;&gt;データのやりとりに gob を使う - Qiita&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;データのsaveとloadの部分をblockchain/model.goの中で記載しています. そのsave/laodの処理を、Web Serverのエンドポイント処理を開始する時点と終了する時点で利用しています.&lt;/p&gt;
+
+&lt;p&gt;あとは割とすんなり実装完了.&lt;/p&gt;
+
+&lt;h2 id=&#34;実際動かしてみて-とまとめ&#34;&gt;実際動かしてみて、とまとめ&lt;/h2&gt;
+
+&lt;p&gt;アプリ側の動くところまでは簡単にいけたのですが、実際には複数サーバ上(単一サーバの場合は除く)で動かすケースが多いはずなので、これはインフラ側も合わせて試してみないと、(分散型管理台帳型の)Blockhainがわかったといえなそう.&lt;/p&gt;
+
+&lt;p&gt;ということで今回はGoを学びました.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Hugo &#43; Gihub &#43; 独自ドメイン(お名前.com) でSSLな話し</title>
