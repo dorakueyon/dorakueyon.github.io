@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<title>今の時代にブロック暗号(ECB)をGoでやってみる</title>
+	
+	<meta name="description" content="">
+	<meta name="image" content="">
+	
+	<meta itemprop="name" content="今の時代にブロック暗号(ECB)をGoでやってみる">
+	<meta itemprop="description" content="">
+	<meta itemprop="image" content="">
+	
+	<meta name="og:title" content="今の時代にブロック暗号(ECB)をGoでやってみる">
+	<meta name="og:description" content="">
+	
+	<meta name="og:url" content="https://dorakueyon.com/posts/ecbwithgo/">
+	<meta name="og:site_name" content="今の時代にブロック暗号(ECB)をGoでやってみる">
+	<meta name="og:type" content="article">
+	
+	<meta name="article:tag" content="">
+	<link rel="stylesheet" type="text/css" href="https://dorakueyon.com/css/style.css">
+	
+	
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-122812538-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+	
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+
+</head>
+
+<body>
+
+<header>
+	
+	<a href="https://dorakueyon.com/" style="float: left;color:#777;">dorakueyon</a>
+	
+	
+	
+	
+	
+    <div class="nav-right" style="float: right;">
+   
+   <a class="level-item" href="https://github.com/dorakueyon" target="_blank">
+     <span class="icon">
+       <i class="fa fa-github"></i>
+     </span>
+   </a>
+   
+   <a class="level-item" href="https://twitter.com/dorakueyon" target="_blank">
+     <span class="icon">
+       <i class="fa fa-twitter"></i>
+     </span>
+   </a>
+   
+    </div>
+</header>
+
+
+<div id="loadingMask" style="width: 100%; height: 100%; position: fixed; background: #fff;"></div>
+<script>
+function fadeOut(el) {
+  el.style.opacity = 1;
+
+  var last = +new Date();
+  var tick = function() {
+    el.style.opacity = +el.style.opacity - (new Date() - last) / 80;
+    last = +new Date();
+    
+
+    if (el.style.opacity > 0) {
+      (window.requestAnimationFrame && requestAnimationFrame(tick)) || setTimeout(tick, 16);
+    } else {
+      el.style.display='none';
+    }
+  };
+
+  tick();
+}
+
+function ready(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+         el = document.getElementById('loadingMask');
+         fadeOut(el);
+        var elements = document.querySelectorAll("img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("alt")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("alt"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+
+    } else {
+        document.addEventListener('DOMContentLoaded', fn);
+    }
+}
+window.onload = ready;
+</script>
+
+<div class="content">
+  <aside>August 12, 2018</aside>
+  <h1>今の時代にブロック暗号(ECB)をGoでやってみる <aside></aside></h1>
+  <section>
+  
+
+<p>暗号化、特に可逆な暗号化について.
+ひょんなことから可逆な暗号化であるブロック暗号、特にECBに興味がでたので、実際にGoで触ってみたときのメモです.</p>
+
+<p>元データによって(よらなくても)は、他の暗号化より圧倒的に復号化しやすいという意味で安全性に難ありなので、まちがってもビジネス上で利用していないことを祈ります.</p>
+
+<h2 id="実際にやってみる">実際にやってみる</h2>
+
+<p>ECBのライブラリーがGoのcrypto/cipherに存在しないか色々と調べてみると、公式では対応しない選択をしたことがわかった。</p>
+
+<ul>
+<li><a href="https://github.com/golang/go/issues/5597">crypto/cipher: Add ECB support · Issue #5597 · golang/go</a></li>
+</ul>
+
+<blockquote>
+<p>We left ECB out intentionally: it&rsquo;s insecure, and if needed it&rsquo;s
+trivial to implement.&rdquo;</p>
+</blockquote>
+
+<p>だそうです.</p>
+
+<p>なので自作の道でやりたいと思います.</p>
+
+<p>Repositoryは下記の通りです.</p>
+
+<iframe
+  class="hatenablogcard"
+  style="width:100%;height:155px;max-width:420px;"
+  src="https://hatenablog-parts.com/embed?url=https%3a%2f%2fgithub.com%2fdorakueyon%2fecb-sample-with-go"
+  title=""
+  width="300"
+  height="150"
+  frameborder="0"
+  scrolling="no">
+</iframe>
+
+
+<h3 id="前処理-pkcs-5-padding">前処理 (PKCS#5 Padding)</h3>
+
+<p>ブロック暗号を行う場合、暗号元のデータ長が、ブロック長の倍数である必要があります。</p>
+
+<p>ブロック長毎に暗号化を行なっていくので、なにかしらの手段で暗号元のデータをブロック長と同じ長さにする処理を、暗号化前に実行します。具体的にはパディング処理です.</p>
+
+<p>今回はPKCS#5 Paddingを利用しました。</p>
+
+<p>PKCS#5 Paddingは、足りない長さを、その長さの数値でパディングします.</p>
+
+<p>暗号化の長さがあと2バイトたりない場合は、0x02を2回ファイルの末尾に追加(padding)することで、ファイルの長さを合わせます。</p>
+
+<p>逆に、暗号化の長さとぴったり一緒の場合は、ブロック長のバイト数を、ブロック長回数分ファイル末尾に追加(padding)します. 例えばブロック長の長さが8byteで、ファイルの長さが8の倍数の場合(8, 16, 24&hellip;)、0x08を8回となります</p>
+
+<p>実装すると下記のような感じ.</p>
+
+<pre><code class="language-go">func PKCS5Padding(text []byte, blockSize int) []byte {
+	padding := blockSize - len(text) % blockSize //padingは上記でいうブロック長に足りない長さ.ちょうどの場合はブロック長
+	padtext := bytes.Repeat([]byte{byte(padding)}, padding)
+	return append(text, padtext...)
+}
+</code></pre>
+
+<p>上記で前処理完了.</p>
+
+<h3 id="ecb">ECB</h3>
+
+<p>さっそくECB.</p>
+
+<ul>
+<li><a href="https://github.com/golang/go/issues/5597">crypto/cipher: Add ECB support · Issue #5597 · golang/go</a></li>
+</ul>
+
+<p>の記事には、実装の手本がのっている.</p>
+
+<pre><code class="language-Go">bs := block.BlockSize()
+if len(plaintext) % bs != 0 { //前処理をしていれば、ブロック長倍になっている
+  panic(&quot;Need a multiple of the blocksize&quot;)
+}
+ciphertext := make([]byte, len(plaintext))
+for len(plaintext) &gt; 0 {
+  block.Encrypt(ciphertext, plaintext)
+  plaintext = plaintext[bs:]
+  ciphertext = ciphertext[bs:]
+}
+</code></pre>
+
+<p>ciphertext := make([]byte, len(plaintext))で暗号化前の文章のサイズ分の領域を作っておき、for文以下で、ブロック長文毎、暗号化を行なっていく.</p>
+
+<h3 id="つなげてみた">つなげてみた</h3>
+
+<p>keyに暗号化で利用するkey、srcに暗号化したいinputをパラメーターでわたす.
+inputがpaddingされ、ECBされる.</p>
+
+<pre><code>$ go run main.go -key private-key -src hoge
+[38 138 235 189 120 176 89 240]
+</code></pre>
+
+<p>暗号化されたものが出力された.
+なるほど.</p>
+
+<h2 id="まとめ">まとめ</h2>
+
+<p>Goを使ったECBの実装をざっとおうことができた.
+次の機会には、「暗号技術入門」なんかを読み直しつつ、気になる暗号化処理を触ってみたい.</p>
+
+  </section>
+</div>
+
+
+
+
+<footer>
+	<p>© 2018 Yohei Iguchi all rights reserved.</a>
+</footer>
+</body>
+</html>
+

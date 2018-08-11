@@ -9,10 +9,122 @@
     <managingEditor>matthew.at.muse@gmail.com (Yohei Iguchi)</managingEditor>
     <webMaster>matthew.at.muse@gmail.com (Yohei Iguchi)</webMaster>
     <copyright>Copyright (C) 2018-2018 Yohei Iguchi All Right Reserved.</copyright>
-    <lastBuildDate>Tue, 07 Aug 2018 22:43:32 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 12 Aug 2018 00:48:34 +0900</lastBuildDate>
     
         <atom:link href="https://dorakueyon.com/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>今の時代にブロック暗号(ECB)をGoでやってみる</title>
+      <link>https://dorakueyon.com/posts/ecbwithgo/</link>
+      <pubDate>Sun, 12 Aug 2018 00:48:34 +0900</pubDate>
+      <author>matthew.at.muse@gmail.com (Yohei Iguchi)</author>
+      <guid>https://dorakueyon.com/posts/ecbwithgo/</guid>
+      <description>
+
+&lt;p&gt;暗号化、特に可逆な暗号化について.
+ひょんなことから可逆な暗号化であるブロック暗号、特にECBに興味がでたので、実際にGoで触ってみたときのメモです.&lt;/p&gt;
+
+&lt;p&gt;元データによって(よらなくても)は、他の暗号化より圧倒的に復号化しやすいという意味で安全性に難ありなので、まちがってもビジネス上で利用していないことを祈ります.&lt;/p&gt;
+
+&lt;h2 id=&#34;実際にやってみる&#34;&gt;実際にやってみる&lt;/h2&gt;
+
+&lt;p&gt;ECBのライブラリーがGoのcrypto/cipherに存在しないか色々と調べてみると、公式では対応しない選択をしたことがわかった。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/golang/go/issues/5597&#34;&gt;crypto/cipher: Add ECB support · Issue #5597 · golang/go&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;We left ECB out intentionally: it&amp;rsquo;s insecure, and if needed it&amp;rsquo;s
+trivial to implement.&amp;rdquo;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;だそうです.&lt;/p&gt;
+
+&lt;p&gt;なので自作の道でやりたいと思います.&lt;/p&gt;
+
+&lt;p&gt;Repositoryは下記の通りです.&lt;/p&gt;
+
+&lt;iframe
+  class=&#34;hatenablogcard&#34;
+  style=&#34;width:100%;height:155px;max-width:420px;&#34;
+  src=&#34;https://hatenablog-parts.com/embed?url=https%3a%2f%2fgithub.com%2fdorakueyon%2fecb-sample-with-go&#34;
+  title=&#34;&#34;
+  width=&#34;300&#34;
+  height=&#34;150&#34;
+  frameborder=&#34;0&#34;
+  scrolling=&#34;no&#34;&gt;
+&lt;/iframe&gt;
+
+
+&lt;h3 id=&#34;前処理-pkcs-5-padding&#34;&gt;前処理 (PKCS#5 Padding)&lt;/h3&gt;
+
+&lt;p&gt;ブロック暗号を行う場合、暗号元のデータ長が、ブロック長の倍数である必要があります。&lt;/p&gt;
+
+&lt;p&gt;ブロック長毎に暗号化を行なっていくので、なにかしらの手段で暗号元のデータをブロック長と同じ長さにする処理を、暗号化前に実行します。具体的にはパディング処理です.&lt;/p&gt;
+
+&lt;p&gt;今回はPKCS#5 Paddingを利用しました。&lt;/p&gt;
+
+&lt;p&gt;PKCS#5 Paddingは、足りない長さを、その長さの数値でパディングします.&lt;/p&gt;
+
+&lt;p&gt;暗号化の長さがあと2バイトたりない場合は、0x02を2回ファイルの末尾に追加(padding)することで、ファイルの長さを合わせます。&lt;/p&gt;
+
+&lt;p&gt;逆に、暗号化の長さとぴったり一緒の場合は、ブロック長のバイト数を、ブロック長回数分ファイル末尾に追加(padding)します. 例えばブロック長の長さが8byteで、ファイルの長さが8の倍数の場合(8, 16, 24&amp;hellip;)、0x08を8回となります&lt;/p&gt;
+
+&lt;p&gt;実装すると下記のような感じ.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;func PKCS5Padding(text []byte, blockSize int) []byte {
+	padding := blockSize - len(text) % blockSize //padingは上記でいうブロック長に足りない長さ.ちょうどの場合はブロック長
+	padtext := bytes.Repeat([]byte{byte(padding)}, padding)
+	return append(text, padtext...)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;上記で前処理完了.&lt;/p&gt;
+
+&lt;h3 id=&#34;ecb&#34;&gt;ECB&lt;/h3&gt;
+
+&lt;p&gt;さっそくECB.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/golang/go/issues/5597&#34;&gt;crypto/cipher: Add ECB support · Issue #5597 · golang/go&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;の記事には、実装の手本がのっている.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Go&#34;&gt;bs := block.BlockSize()
+if len(plaintext) % bs != 0 { //前処理をしていれば、ブロック長倍になっている
+  panic(&amp;quot;Need a multiple of the blocksize&amp;quot;)
+}
+ciphertext := make([]byte, len(plaintext))
+for len(plaintext) &amp;gt; 0 {
+  block.Encrypt(ciphertext, plaintext)
+  plaintext = plaintext[bs:]
+  ciphertext = ciphertext[bs:]
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ciphertext := make([]byte, len(plaintext))で暗号化前の文章のサイズ分の領域を作っておき、for文以下で、ブロック長文毎、暗号化を行なっていく.&lt;/p&gt;
+
+&lt;h3 id=&#34;つなげてみた&#34;&gt;つなげてみた&lt;/h3&gt;
+
+&lt;p&gt;keyに暗号化で利用するkey、srcに暗号化したいinputをパラメーターでわたす.
+inputがpaddingされ、ECBされる.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ go run main.go -key private-key -src hoge
+[38 138 235 189 120 176 89 240]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;暗号化されたものが出力された.
+なるほど.&lt;/p&gt;
+
+&lt;h2 id=&#34;まとめ&#34;&gt;まとめ&lt;/h2&gt;
+
+&lt;p&gt;Goを使ったECBの実装をざっとおうことができた.
+次の機会には、「暗号技術入門」なんかを読み直しつつ、気になる暗号化処理を触ってみたい.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>BlockchainをGoを使って学ぶ (或いはGoをBlockChainを使って学ぶ)</title>

@@ -3,6 +3,10 @@ body, li p {
 	font-family: "游ゴシック",YuGothic,"ヒラギノ角ゴ Pro","Hiragino Kaku Gothic Pro","メイリオ","Meiryo",sans-serif;
 }
 
+code, kbd, pre, samp {
+  font-family: monospace, serif;
+}
+
 h1,h2,h3,h4,h5,h6,header,header.a {
     color: #263c4c;
 }
