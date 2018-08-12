@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<title>Hugo &#43; Gihub &#43; 独自ドメイン(お名前.com) でSSLな話し</title>
+	
+	<meta name="description" content="">
+	<meta name="image" content="">
+	
+	<meta itemprop="name" content="Hugo &#43; Gihub &#43; 独自ドメイン(お名前.com) でSSLな話し">
+	<meta itemprop="description" content="">
+	<meta itemprop="image" content="">
+	
+	<meta name="og:title" content="Hugo &#43; Gihub &#43; 独自ドメイン(お名前.com) でSSLな話し">
+	<meta name="og:description" content="">
+	
+	<meta name="og:url" content="https://dorakueyon.com/posts/2018/07/24/hugogithuboriginaldomainssl/">
+	<meta name="og:site_name" content="Hugo &#43; Gihub &#43; 独自ドメイン(お名前.com) でSSLな話し">
+	<meta name="og:type" content="article">
+	
+	<meta name="article:tag" content="">
+	<link rel="stylesheet" type="text/css" href="https://dorakueyon.com/css/style.css">
+	
+	
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-122812538-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+	
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+
+</head>
+
+<body>
+
+<header>
+	
+	<a href="https://dorakueyon.com/" style="float: left;color:#777;">dorakueyon</a>
+	
+	
+	
+	
+	
+    <div class="nav-right" style="float: right;">
+   
+   <a class="level-item" href="https://github.com/dorakueyon" target="_blank">
+     <span class="icon">
+       <i class="fa fa-github"></i>
+     </span>
+   </a>
+   
+   <a class="level-item" href="https://twitter.com/dorakueyon" target="_blank">
+     <span class="icon">
+       <i class="fa fa-twitter"></i>
+     </span>
+   </a>
+   
+    </div>
+</header>
+
+
+<div id="loadingMask" style="width: 100%; height: 100%; position: fixed; background: #fff;"></div>
+<script>
+function fadeOut(el) {
+  el.style.opacity = 1;
+
+  var last = +new Date();
+  var tick = function() {
+    el.style.opacity = +el.style.opacity - (new Date() - last) / 80;
+    last = +new Date();
+    
+
+    if (el.style.opacity > 0) {
+      (window.requestAnimationFrame && requestAnimationFrame(tick)) || setTimeout(tick, 16);
+    } else {
+      el.style.display='none';
+    }
+  };
+
+  tick();
+}
+
+function ready(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+         el = document.getElementById('loadingMask');
+         fadeOut(el);
+        var elements = document.querySelectorAll("img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("alt")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("alt"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+
+    } else {
+        document.addEventListener('DOMContentLoaded', fn);
+    }
+}
+window.onload = ready;
+</script>
+
+<div class="content">
+    <aside>
+        <i class="fa fa-calendar-minus-o"></i>
+        July 24, 2018
+    
+        <i class="fa fa-refresh"></i>
+        July 11, 2018
+    
+    </aside>
+  <h1>Hugo &#43; Gihub &#43; 独自ドメイン(お名前.com) でSSLな話し <aside></aside>
+  </h1>
+  <section>
+  
+
+<p>題名通り、新たにHugoを使ったブログを作るときに利用したサイトとかをメモ.</p>
+
+<p>そもそもブログを作るに至った経緯はまた別の話し.</p>
+
+<h2 id="hugo">Hugo</h2>
+
+<h3 id="導入">導入</h3>
+
+<p>Hugoの導入(ローカルでserver動かしてWebブラウザでみるところまで)は特にハマりどころなし.
+お好きな記事でどうぞ.</p>
+
+<h3 id="デザインの選定">デザインの選定</h3>
+
+<p>ここは沼にハマると一番時間がかかる部分.
+Hugoの見た目は基本下記3パターンのアプローチがある.</p>
+
+<ol>
+<li>ふろむフルスクラッチ</li>
+<li>既存のThemeを利用してそのまま利用</li>
+<li>既存のThemeを利用しつつ上書き修正</li>
+</ol>
+
+<p>1.はまずHugo初級者からすると下調べから時間かかるので却下。
+ということで普通の人は2.か3.にいきつくと思う.</p>
+
+<p>結論、3. にならざるおえないかな.</p>
+
+<p>まずは2.で落ち着けるか下記の公式を巡回</p>
+
+<ul>
+<li><a href="https://themes.gohugo.io/">Complete List | Hugo Themes</a></li>
+</ul>
+
+<p>400近いThemesから自分の理想なThe Oneを見つけるのは胸が苦しくなったのでいくつかのランキング系まとめサイトに逃げた.</p>
+
+<ul>
+<li><a href="https://discourse.gohugo.io/t/theme-recommendations/5816/5">Theme recommendations - support - Hugo Discussion</a></li>
+<li><a href="https://terrty.net/2018/15-hugo-framework-blog-themes/">15 Hugo Framework blog themes - Notes on Blue Skies</a>)]</li>
+</ul>
+
+<p>欲しかったのはシンプル/ミニマリスティックなやつ.
+結局200近くくらい見比べつつ適当に手元にcloneしながら確認しつつ、最終的に下記のThemeに決めた</p>
+
+<ul>
+<li><a href="https://themes.gohugo.io/hugo-theme-one/">Hugo Theme One | Hugo Themes</a></li>
+</ul>
+
+<p>その名も&rdquo;One&rdquo;.
+そう、まさに僕だけのThe Oneだね.</p>
+
+<p>ただ英語が基本のデザインなのか、自分の狙う感じのデザインには若干ずれてる. ちょっとそれじゃない感が要所要所にある感じ.</p>
+
+<p>そうすると気になるところからHTML/CSS修正したくなってしまい、結局多少デザインいじることに.</p>
+
+<p>差分は下記のような感じ.</p>
+
+<pre><code>$ diff -r ./layouts ./themes/one/layouts | grep -E '^[\+|-]\s' | wc -l
+      26
+
+$ diff -r ./static/css ./themes/one/static/css | grep -E '^[\+|-]\s' | wc -l
+      61
+</code></pre>
+
+<p>html系が26行前後、cssが61行言語修正した. (加筆修正含む)
+こうしてみると100行以下修正するだけで個人的に満足いくデザインになるのは嬉しい.</p>
+
+<p>ちなみに今回初めて知った名詞でblog-card|ブログカードというものがあって、なんてことはないはてぶとかでよく見るやつ
+↓これ
+<iframe
+  class="hatenablogcard"
+  style="width:100%;height:155px;max-width:420px;"
+  src="https://hatenablog-parts.com/embed?url=https%3a%2f%2fgithub.com%2fdorakueyon"
+  title=""
+  width="300"
+  height="150"
+  frameborder="0"
+  scrolling="no">
+</iframe>
+</p>
+
+<p>ライトな記法で↑みたいに展開するために、layouts配下に新規にshortcodesフォルダを追加して、他の方々のやつを参考に自分でも使わせていただいた.</p>
+
+<p>あまり使いすぎるとHugo以外に移行するときに移行スクリプトの作成が必要になるかな. という不安も拭えないのであまり種類ふやさず運用していこう.</p>
+
+<p>ここまででとりあえずローカル上で動くところまでおわる.</p>
+
+<h2 id="github">Github</h2>
+
+<h3 id="導入-1">導入</h3>
+
+<p>ここも特に難しい所はないはずなので、特に記載はしません.</p>
+
+<p>ここまででとりあえずWeb上で動くところまでおわる.
+そしてこの時点でSSL対応も完了しているのでとりあえずサイトをWebに公開したい、っていう人はここまで.</p>
+
+<p>ただしドメインはgithub.io</p>
+
+<p>ベンダーロックインは死んでもするなと死んだおじいさんに言われているので、感動も冷めやらぬまま独自ドメインの設定に.</p>
+
+<h2 id="独自ドメイン">独自ドメイン</h2>
+
+<p>ドメインを持っていなければまずは取得ということになる.
+これは正直なんでもよい。</p>
+
+<p>ムーム? ディグネーション？とか色々あるけどやはり日本語名称の安心感から<a href="https://www.onamae.com">お名前.com</a>を利用.</p>
+
+<p>ここからSSLを見越したDSNの設定をしていく.</p>
+
+<h2 id="またまたgithub-ssl化">またまたGithub (SSL化)</h2>
+
+<p>SSLにしようと色々とCloudFrontとか使って頑張ろうとしたんだけど、結局Github側でgithub.ioのSSL化まで対応されていた.(2018年2月ごろより)</p>
+
+<p>CloudFrontにNSむけてしまっていたがシンプルな構成にするためにGithub側でのSSL化をすることに.</p>
+
+<ul>
+<li><a href="https://qiita.com/foobaron/items/cd9cfc403defa706372b">GitHub Pages + 独自ドメイン + HTTPS (SSL) のサポートをGitHubが提供開始 - Qiita</a></li>
+</ul>
+
+<p>ここらへんを参考に、ドメイン管理サイト側でAレコードを設定していく.</p>
+
+<p>設定は完了したのだがTTLが標準のままだったようなので各所のDNSサーバーに新Aレコード設定が染み渡るのは時間がかかるようでまだサイトへの疎通が確認できていない.</p>
+
+<p>このページが見れているということは新しい設定が世界に染み渡った結果です.</p>
+
+<p>ちなみに&rdquo;染み出す&rdquo;というワードを使う人が現職で多いのだけど、使うのが恥ずかしくて意識をしないと口からでてこない.</p>
+
+<p>以上です.</p>
+
+  </section>
+</div>
+
+
+
+
+<footer>
+	<p>© 2018 Yohei Iguchi all rights reserved.</a>
+</footer>
+</body>
+</html>
+
