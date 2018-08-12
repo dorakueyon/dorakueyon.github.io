@@ -29,7 +29,7 @@
 
 &lt;h2 id=&#34;実際にやってみる&#34;&gt;実際にやってみる&lt;/h2&gt;
 
-&lt;p&gt;ECBのライブラリーがGoのcrypto/cipherに存在しないか色々と調べてみると、公式では対応しない選択をしたことがわかった。&lt;/p&gt;
+&lt;p&gt;ECBのライブラリーがGoのcrypto/cipherに存在しないか色々と調べてみると、公式では対応しない選択をしたことがわかった.&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;https://github.com/golang/go/issues/5597&#34;&gt;crypto/cipher: Add ECB support · Issue #5597 · golang/go&lt;/a&gt;&lt;/li&gt;
@@ -60,15 +60,15 @@ trivial to implement.&amp;rdquo;&lt;/p&gt;
 
 &lt;h3 id=&#34;前処理-pkcs-5-padding&#34;&gt;前処理 (PKCS#5 Padding)&lt;/h3&gt;
 
-&lt;p&gt;ブロック暗号を行う場合、暗号元のデータ長が、ブロック長の倍数である必要があります。&lt;/p&gt;
+&lt;p&gt;ブロック暗号を行う場合、暗号元のデータ長が、ブロック長の倍数である必要があります.&lt;/p&gt;
 
-&lt;p&gt;ブロック長毎に暗号化を行なっていくので、なにかしらの手段で暗号元のデータをブロック長と同じ長さにする処理を、暗号化前に実行します。具体的にはパディング処理です.&lt;/p&gt;
+&lt;p&gt;ブロック長毎に暗号化を行なっていくので、なにかしらの手段で暗号元のデータをブロック長と同じ長さにする処理を、暗号化前に実行します.具体的にはパディング処理です.&lt;/p&gt;
 
-&lt;p&gt;今回はPKCS#5 Paddingを利用しました。&lt;/p&gt;
+&lt;p&gt;今回はPKCS#5 Paddingを利用しました.&lt;/p&gt;
 
 &lt;p&gt;PKCS#5 Paddingは、足りない長さを、その長さの数値でパディングします.&lt;/p&gt;
 
-&lt;p&gt;暗号化の長さがあと2バイトたりない場合は、0x02を2回ファイルの末尾に追加(padding)することで、ファイルの長さを合わせます。&lt;/p&gt;
+&lt;p&gt;暗号化の長さがあと2バイトたりない場合は、0x02を2回ファイルの末尾に追加(padding)することで、ファイルの長さを合わせます.&lt;/p&gt;
 
 &lt;p&gt;逆に、暗号化の長さとぴったり一緒の場合は、ブロック長のバイト数を、ブロック長回数分ファイル末尾に追加(padding)します. 例えばブロック長の長さが8byteで、ファイルの長さが8の倍数の場合(8, 16, 24&amp;hellip;)、0x08を8回となります&lt;/p&gt;
 
