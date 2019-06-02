@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>dorakueyon</title>
@@ -8,7 +7,7 @@
     <language>ja-jp</language>
     <managingEditor>matthew.at.muse@gmail.com (Yohei Iguchi)</managingEditor>
     <webMaster>matthew.at.muse@gmail.com (Yohei Iguchi)</webMaster>
-    <copyright>© Yohei Iguchi 2018</copyright>
+    <copyright>© Yohei Iguchi 2019</copyright>
     <lastBuildDate>Sun, 09 Sep 2018 20:50:58 +0900</lastBuildDate>
     
         <atom:link href="https://dorakueyon.com/index.xml" rel="self" type="application/rss+xml" />
