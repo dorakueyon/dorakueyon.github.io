@@ -158,6 +158,39 @@ git push origin master
 
 <p>こちらのポストは上記スクリプトを試用するためのものです.</p>
 
+<p>commitメッセージも引数で追加できます.</p>
+
+<pre><code>[dorakueyon]% ./build_and_deploy.sh &quot;shell&quot;
+Deploying updates to GitHub...
+
+                   | EN
++------------------+----+
+  Pages            | 15
+  Paginator pages  |  0
+  Non-page files   |  0
+  Static files     |  1
+  Processed images |  0
+  Aliases          |  0
+  Sitemaps         |  1
+  Cleaned          |  0
+
+Total in 368 ms
+[master b16d109] shell
+ 6 files changed, 284 insertions(+), 9 deletions(-)
+ create mode 100644 posts/2019/12/28/hugodeployshell/index.html
+Enumerating objects: 20, done.
+Counting objects: 100% (20/20), done.
+Delta compression using up to 4 threads
+Compressing objects: 100% (9/9), done.
+Writing objects: 100% (13/13), 3.95 KiB | 808.00 KiB/s, done.
+Total 13 (delta 7), reused 0 (delta 0)
+remote: Resolving deltas: 100% (7/7), completed with 6 local objects.
+To https://github.com/dorakueyon/dorakueyon.github.io.git
+   4668c54..b16d109  master -&gt; master
+</code></pre>
+
+<p>時短ですね.</p>
+
   </section>
 </div>
 
