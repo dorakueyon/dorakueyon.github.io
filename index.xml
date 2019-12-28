@@ -8,10 +8,94 @@
     <managingEditor>matthew.at.muse@gmail.com (Yohei Iguchi)</managingEditor>
     <webMaster>matthew.at.muse@gmail.com (Yohei Iguchi)</webMaster>
     <copyright>© Yohei Iguchi 2019</copyright>
-    <lastBuildDate>Sat, 28 Dec 2019 22:16:14 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 29 Dec 2019 07:35:18 +0900</lastBuildDate>
     
         <atom:link href="https://dorakueyon.com/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>1兆ドルコーチ から学ぶプロダクトマネージャーの姿勢</title>
+      <link>https://dorakueyon.com/posts/2019/12/29/trillion-doller-coach/</link>
+      <pubDate>Sun, 29 Dec 2019 07:35:18 +0900</pubDate>
+      <author>matthew.at.muse@gmail.com (Yohei Iguchi)</author>
+      <guid>https://dorakueyon.com/posts/2019/12/29/trillion-doller-coach/</guid>
+      <description>
+
+&lt;p&gt;「1兆ドルコーチ」は&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;アメフトのコーチ出身でありながら、
+優秀なプロ経営者。
+ジョブズの師であると同時に、
+グーグル創業者たちを育て上げ、
+アマゾンのベゾスを苦境から救った伝説の存在。
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;と言われるビル・キャンベル氏に関する書籍です.
+彼がグーグル、アマゾンなどの企業をコーチングした結果生まれた企業価値を合算すると1兆ドルはくだらないだろう、ということで「1兆ドルコーチ」と言われた人物です.&lt;/p&gt;
+
+&lt;p&gt;主に「コーチング」を取り扱った書籍ではあるのですが、プロダクトマネージャーに関する姿勢にも通ずる部分が多く書かれていたと感じています.&lt;/p&gt;
+
+&lt;p&gt;「コーチング」部分についてより深く理解したい方は、是非書籍を是非読んでみてください.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.amazon.co.jp/1%E5%85%86%E3%83%89%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%81%E2%80%95%E2%80%95%E3%82%B7%E3%83%AA%E3%82%B3%E3%83%B3%E3%83%90%E3%83%AC%E3%83%BC%E3%81%AE%E3%83%AC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%89-%E3%83%93%E3%83%AB%E3%83%BB%E3%82%AD%E3%83%A3%E3%83%B3%E3%83%99%E3%83%AB%E3%81%AE%E6%88%90%E5%8A%9F%E3%81%AE%E6%95%99%E3%81%88-%E3%82%A8%E3%83%AA%E3%83%83%E3%82%AF%E3%83%BB%E3%82%B7%E3%83%A5%E3%83%9F%E3%83%83%E3%83%88-ebook/dp/B07ZCY5BXF/ref=tmm_kin_swatch_0?_encoding=UTF8&amp;amp;qid=1577572439&amp;amp;sr=1-1&#34;&gt;1兆ドルコーチ: kindle&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;リーダーは人が作る&#34;&gt;リーダーは人が作る&lt;/h2&gt;
+
+&lt;p&gt;グーグルでマネージャー不要論が存在したことは有名な話です.
+「管理されることを嫌い、自立して活動できるエンジニアなら、マネージャは不要なはず」ということでマネージャが一時期廃止されました.&lt;/p&gt;
+
+&lt;p&gt;しかし、数年後「マネージャー」は必用である、という点に落ち着いたようです.&lt;/p&gt;
+
+&lt;p&gt;ここでエンジニアにとり必用とされた「マネージャー」の資質は、ビルによると&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;学ぶことができる&lt;/li&gt;
+&lt;li&gt;意思決定を助けてくれる&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;という点をあげていました。&lt;/p&gt;
+
+&lt;p&gt;特に、「意思決定を助けてくれる」という点は私も重要に感じています.&lt;/p&gt;
+
+&lt;p&gt;プロダクトマネージャーとしても、常に最善の決定が行えるわけではなく、不確実性の高い中で何かしらの決定をして進めていく必用があります.&lt;/p&gt;
+
+&lt;p&gt;最終的に誤った決定と判断されてしまうものもあります. ただし、自分たちメンバーにとって最善と考える決定を積み重ねることが、プロダクトを作って行く上でも重要な姿勢であると感じています&lt;/p&gt;
+
+&lt;p&gt;決定しない &amp;lt; 誤った決定 &amp;lt; 正しい決定&lt;/p&gt;
+
+&lt;p&gt;メンバーが必用としているのは、何かしらの決定ができるリーダー/プロダクトマネージャーです.&lt;/p&gt;
+
+&lt;h2 id=&#34;信頼-の非凡な影響力&#34;&gt;「信頼」の非凡な影響力&lt;/h2&gt;
+
+&lt;p&gt;「何をするか」ではなく、「何をやるべきか」を伝える.
+この言葉も、メンバーの先頭にたつ人間が常に考えるべき点です.&lt;/p&gt;
+
+&lt;p&gt;「何をするか」のhowの部分は、人から人に伝えられて考えるべきものではありません.
+特にエンジニアリングの場合には、一人(またはペアプロなど複数)の人間が考え抜くことができるからこそ、howの精度があがります.&lt;/p&gt;
+
+&lt;p&gt;ただし、メンバーとの関係性/信頼関係ができていない場合には、「何をやるべきか」という言葉のみでプロダクト開発を進めていくことは困難になりがちです.&lt;/p&gt;
+
+&lt;p&gt;お互いが信頼できる関係性を作ることも、プロダクトマネージャーの重要な資質の一つです. 例えば、(自分もあまりできてなくて反省なのですが) 他の人が話している最中に、つい相手が言いたいことを「こういうことだよね」と言ってしまうことがあります.&lt;/p&gt;
+
+&lt;p&gt;会話とは相手の言いたいことを当てるゲームではありません. 相手が話していることを傾聴する. 意外とこういう点も信頼関係が醸成される起点になるのではと感じています.&lt;/p&gt;
+
+&lt;h2 id=&#34;チーム-ファースト&#34;&gt;チーム・ファースト&lt;/h2&gt;
+
+&lt;p&gt;「寝ても覚めてもチームのことを考えているか」&lt;/p&gt;
+
+&lt;p&gt;耳が痛い言葉です.
+そのサービス/プロダクトを一番考えている人は、通常はプロダクトマネージャーです. 他のメンバーと協業する前に、自身がTeam First/ Product Firstという姿勢を持てているのか、自問するほうがよさそうです.&lt;/p&gt;
+
+&lt;h2 id=&#34;おわりに&#34;&gt;おわりに&lt;/h2&gt;
+
+&lt;p&gt;最終章のタイトルは&lt;code&gt;パワー・オブ・ラブ - ビジネスに愛を持ち込め&lt;/code&gt;となっています.
+これまで見てきたように、今回の書籍は「スキル」よりも「スタンス」に関しての本です.&lt;/p&gt;
+
+&lt;p&gt;「人に関心を持つ」ということの重要性が、この本の根底に流れているように感じます.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>HUGOのプロジェクトをGithub Pagesにdeployするscriptで時短</title>
