@@ -148,17 +148,18 @@ aside em {
 
 p {
 	margin-bottom: 1em;
-	line-height: 1.45;
+	line-height: 1.5;
     color: #555;
     margin: 0 0 1.5em;
 }
 
 ul,ol {
-	margin-bottom: 1em;
-	padding-left: 1em;
+	margin: 1.5em 0;
+	padding-left: 2.5em;
 }
 
 li {
+	color: #555;
 	line-height: 1.75em;
 	margin-left: 0.75em;
     margin-bottom: 0.5em;
