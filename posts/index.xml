@@ -40,6 +40,19 @@ error Commands cannot run with an incompatible environment.
 info Visit https://yarnpkg.com/en/docs/cli/run &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; documentation about this command.&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;このように、異なるversionが依存する開発では、その依存性をDockerに閉じ込めることで幸せになれます.&lt;/p&gt;
 
+&lt;p&gt;参考として、githubにcodeを置かせていただきました.
+&lt;iframe
+  class=&#34;hatenablogcard&#34;
+  style=&#34;width:100%;height:155px;max-width:420px;&#34;
+  src=&#34;https://hatenablog-parts.com/embed?url=https%3a%2f%2fgithub.com%2fdorakueyon%2fvue-firebase-cloud-function-docker-starter&#34;
+  title=&#34;&#34;
+  width=&#34;300&#34;
+  height=&#34;150&#34;
+  frameborder=&#34;0&#34;
+  scrolling=&#34;no&#34;&gt;
+&lt;/iframe&gt;
+&lt;/p&gt;
+
 &lt;h2 id=&#34;vue-js-cloud-functionsのフォルダ構成&#34;&gt;Vue.js + Cloud Functionsのフォルダ構成&lt;/h2&gt;
 
 &lt;p&gt;Docker化する前に、プロジェクトを作成した上でフォルダ構成をみてみます.&lt;/p&gt;
@@ -173,7 +186,7 @@ $ firebase init&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;COPY ./functions/tsconfig.json &lt;span class=&#34;nv&#34;&gt;$WORKDIR&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
 &lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;COPY ./functions/lib &lt;span class=&#34;nv&#34;&gt;$WORKDIR&lt;/span&gt;/lib&lt;span class=&#34;err&#34;&gt;
 &lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;COPY ./functions/src &lt;span class=&#34;nv&#34;&gt;$WORKDIR&lt;/span&gt;/src&lt;span class=&#34;err&#34;&gt;
-&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# for symbolic link (./functions/src/services/project-name)&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# # for symbolic link (./functions/src/services/project-name)&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
 &lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# COPY ./src/services/project-name /work/src/services/project-name&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
 &lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
 &lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# firebase&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
@@ -216,7 +229,7 @@ $ firebase init&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;            - ./functions/lib:/work/functions/lib&lt;span class=&#34;err&#34;&gt;
 &lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;            - ./functions/src:/work/functions/src&lt;span class=&#34;err&#34;&gt;
 &lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;            - ./src:/work/src &lt;span class=&#34;c1&#34;&gt;# for symbolic link&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
-&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;        &lt;span class=&#34;c1&#34;&gt;#environment:&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;        &lt;span class=&#34;c1&#34;&gt;# environment:&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
 &lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;        &lt;span class=&#34;c1&#34;&gt;#    - GOOGLE_APPLICATION_CREDENTIALS=./credentials/firebase-adminsdk.json&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
 &lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;        ports:&lt;span class=&#34;err&#34;&gt;
 &lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;            - &lt;span class=&#34;m&#34;&gt;5000&lt;/span&gt;:5000&lt;span class=&#34;err&#34;&gt;

@@ -147,6 +147,19 @@ error Commands cannot run with an incompatible environment.
 info Visit https://yarnpkg.com/en/docs/cli/run <span class="k">for</span> documentation about this command.</code></pre></div>
 <p>このように、異なるversionが依存する開発では、その依存性をDockerに閉じ込めることで幸せになれます.</p>
 
+<p>参考として、githubにcodeを置かせていただきました.
+<iframe
+  class="hatenablogcard"
+  style="width:100%;height:155px;max-width:420px;"
+  src="https://hatenablog-parts.com/embed?url=https%3a%2f%2fgithub.com%2fdorakueyon%2fvue-firebase-cloud-function-docker-starter"
+  title=""
+  width="300"
+  height="150"
+  frameborder="0"
+  scrolling="no">
+</iframe>
+</p>
+
 <h2 id="vue-js-cloud-functionsのフォルダ構成">Vue.js + Cloud Functionsのフォルダ構成</h2>
 
 <p>Docker化する前に、プロジェクトを作成した上でフォルダ構成をみてみます.</p>
@@ -280,7 +293,7 @@ $ firebase init</code></pre></div>
 </span><span class="err"></span>COPY ./functions/tsconfig.json <span class="nv">$WORKDIR</span><span class="err">
 </span><span class="err"></span>COPY ./functions/lib <span class="nv">$WORKDIR</span>/lib<span class="err">
 </span><span class="err"></span>COPY ./functions/src <span class="nv">$WORKDIR</span>/src<span class="err">
-</span><span class="err"></span><span class="c"># for symbolic link (./functions/src/services/project-name)</span><span class="err">
+</span><span class="err"></span><span class="c"># # for symbolic link (./functions/src/services/project-name)</span><span class="err">
 </span><span class="err"></span><span class="c"># COPY ./src/services/project-name /work/src/services/project-name</span><span class="err">
 </span><span class="err">
 </span><span class="err"></span><span class="c"># firebase</span><span class="err">
@@ -323,7 +336,7 @@ $ firebase init</code></pre></div>
 </span><span class="err"></span>            - ./functions/lib:/work/functions/lib<span class="err">
 </span><span class="err"></span>            - ./functions/src:/work/functions/src<span class="err">
 </span><span class="err"></span>            - ./src:/work/src <span class="c1"># for symbolic link</span><span class="err">
-</span><span class="err"></span>        <span class="c1">#environment:</span><span class="err">
+</span><span class="err"></span>        <span class="c1"># environment:</span><span class="err">
 </span><span class="err"></span>        <span class="c1">#    - GOOGLE_APPLICATION_CREDENTIALS=./credentials/firebase-adminsdk.json</span><span class="err">
 </span><span class="err"></span>        ports:<span class="err">
 </span><span class="err"></span>            - <span class="m">5000</span>:5000<span class="err">
