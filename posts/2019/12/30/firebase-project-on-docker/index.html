@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<title>Firebase フロントエンド(Vue.js)/Cloud Functions を同一docker-composeで実行する際に感じたこと</title>
+	
+	<meta name="description" content="">
+	<meta name="image" content="">
+	
+	<meta itemprop="name" content="Firebase フロントエンド(Vue.js)/Cloud Functions を同一docker-composeで実行する際に感じたこと">
+	<meta itemprop="description" content="">
+	<meta itemprop="image" content="">
+	
+	<meta name="og:title" content="Firebase フロントエンド(Vue.js)/Cloud Functions を同一docker-composeで実行する際に感じたこと">
+	<meta name="og:description" content="">
+	
+	<meta name="og:url" content="https://dorakueyon.com/posts/2019/12/30/firebase-project-on-docker/">
+	<meta name="og:site_name" content="Firebase フロントエンド(Vue.js)/Cloud Functions を同一docker-composeで実行する際に感じたこと">
+	<meta name="og:type" content="article">
+	
+	<meta name="article:tag" content="">
+	<link rel="stylesheet" type="text/css" href="https://dorakueyon.com/css/style.css">
+	<link rel="stylesheet" type="text/css" href="https://dorakueyon.com/css/syntax.css">
+	
+	
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-122812538-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+	
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+
+</head>
+
+<body>
+
+<header>
+	
+	<a href="https://dorakueyon.com/" style="float: left;color:#777;">dorakueyon</a>
+	
+	
+	
+	
+	
+    <div class="nav-right" style="float: right;">
+   
+   <a class="level-item" href="https://github.com/dorakueyon" target="_blank">
+     <span class="icon">
+       <i class="fa fa-github"></i>
+     </span>
+   </a>
+   
+   <a class="level-item" href="https://twitter.com/dorakueyon" target="_blank">
+     <span class="icon">
+       <i class="fa fa-twitter"></i>
+     </span>
+   </a>
+   
+    </div>
+</header>
+
+
+<div id="loadingMask" style="width: 100%; height: 100%; position: fixed; background: #fff;"></div>
+<script>
+function fadeOut(el) {
+  el.style.opacity = 1;
+
+  var last = +new Date();
+  var tick = function() {
+    el.style.opacity = +el.style.opacity - (new Date() - last) / 80;
+    last = +new Date();
+    
+
+    if (el.style.opacity > 0) {
+      (window.requestAnimationFrame && requestAnimationFrame(tick)) || setTimeout(tick, 16);
+    } else {
+      el.style.display='none';
+    }
+  };
+
+  tick();
+}
+
+function ready(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+         el = document.getElementById('loadingMask');
+         fadeOut(el);
+        var elements = document.querySelectorAll("img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("alt")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("alt"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+
+    } else {
+        document.addEventListener('DOMContentLoaded', fn);
+    }
+}
+window.onload = ready;
+</script>
+
+<div class="content">
+    <aside>
+        December 30, 2019
+    </aside>
+  <h1>Firebase フロントエンド(Vue.js)/Cloud Functions を同一docker-composeで実行する際に感じたこと <aside></aside>
+  </h1>
+  <section>
+  
+
+<h2 id="はじめに">はじめに</h2>
+
+<p>2019/12/30現在において、Firebaseを開発する際に生じる不都合の一つとして、node version管理があると思います.</p>
+
+<p>Cloud Functionsの開発において、nodeのバージョンはversion8、あるいは10がサポートされています.</p>
+
+<blockquote>
+<p>Cloud Functions ランタイムに関数をデプロイするには Firebase CLI が必要です。Node.js バージョン 8 と 10 がサポートされています。Node.js と npm をインストールする場合は、Node Version Manager をおすすめします。
+<a href="https://firebase.google.com/docs/functions/get-started?hl=ja">https://firebase.google.com/docs/functions/get-started?hl=ja</a></p>
+</blockquote>
+
+<p>つまり、こんなことが頻発します.</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="o">[</span>dorakueyon<span class="o">]</span>% yarn build
+yarn run v1.19.2
+error functions@: The engine <span class="s2">&#34;node&#34;</span> is incompatible with this module. Expected version <span class="s2">&#34;8&#34;</span>. Got <span class="s2">&#34;10.15.3&#34;</span>
+error Commands cannot run with an incompatible environment.
+info Visit https://yarnpkg.com/en/docs/cli/run <span class="k">for</span> documentation about this command.</code></pre></div>
+<p>このように、異なるversionが依存する開発では、その依存性をDockerに閉じ込めることで幸せになれます.</p>
+
+<h2 id="vue-js-cloud-functionsのフォルダ構成">Vue.js + Cloud Functionsのフォルダ構成</h2>
+
+<p>Docker化する前に、プロジェクトを作成した上でフォルダ構成をみてみます.</p>
+
+<ul>
+<li>Vue.js + Firebaseプロジェクト作成</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ vue create project-name
+$ firebase init</code></pre></div>
+<ul>
+<li>フォルダ構成 (node_modules配下を除いています)</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">.
+├── README.md
+├── babel.config.js
+├── firebase.json
+├── functions
+│   ├── node_modules
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── src
+│   └── tsconfig.json
+├── node_modules
+├── package.json
+├── public
+│   ├── favicon.ico
+│   └── index.html
+├── src
+│   ├── App.vue
+│   ├── assets
+│   ├── components
+│   ├── main.ts
+│   ├── router
+│   ├── shims-tsx.d.ts
+│   ├── shims-vue.d.ts
+│   └── views
+├── tsconfig.json
+└── yarn.lock</code></pre></div>
+<p>FrontとCloud Functionsを開発する場合、プロジェクト直下と./funcions直下とで開発環境が分かれます.</p>
+
+<p>それぞれにDockerfileを配置した上で、プロジェクト直下にdocker-compose.ymlを配置します.</p>
+
+<ul>
+<li>Dockerファイルを追加したフォルダ構成 (node_modules配下を除いています)</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">.
+├── Dockerfile &lt;-
+├── README.md
+├── babel.config.js
+├── docker-compose.yml &lt;-
+├── firebase.json
+├── functions
+│   ├── Dockerfile &lt;-
+│   ├── node_modules
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── src
+│   │     ├── index.ts
+│   │     └── services
+│   │         └── project-name -&gt; ../../../src/services/project-name &lt;- シンボリックリンク
+│   └── tsconfig.json
+├── node_modules
+├── package.json
+├── public
+│   ├── favicon.ico
+│   └── index.html
+├── src
+│   ├── App.vue
+│   ├── assets
+│   ├── components
+│   ├── main.ts
+│   ├── router
+│   ├── services
+│   │   └── project-name &lt;- シンボリックリンク先
+│   │       └── constants.ts
+│   ├── shims-tsx.d.ts
+│   ├── shims-vue.d.ts
+│   └── views
+├── tsconfig.json
+└── yarn.lock</code></pre></div>
+<h2 id="docker化">Docker化</h2>
+
+<p>Docker化にむけて、下記の要件があります.</p>
+
+<ul>
+<li>プロジェクト直下のfirebase関連ファイル(firebase.json, .firebaserc)を、./functions側でも参照したい</li>
+<li>./functions側からプロジェクト直下の定数やtypeをシンボリックリンクで参照する場合がある</li>
+</ul>
+
+<p>上記を念頭に、<code>Dockerfile/docker-compose.yml</code>を作成します.</p>
+
+<h3 id="プロジェクト直下のdockerfile">プロジェクト直下のDockerfile</h3>
+
+<ul>
+<li>こちらは特に考えることはありません</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-Docker" data-lang="Docker"><span class="k">FROM</span><span class="s"> node:12-alpine</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="k">ENV</span><span class="s"> WORKDIR /work</span><span class="err">
+</span><span class="err"></span><span class="k">WORKDIR</span><span class="s"> $WORKDIR</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span>COPY package.json <span class="nv">$WORKDIR</span><span class="err">
+</span><span class="err"></span><span class="k">RUN</span> yarn<span class="err">
+</span><span class="err">
+</span><span class="err"></span>COPY tsconfig.json <span class="nv">$WORKDIR</span><span class="err">
+</span><span class="err"></span>COPY *.config.js <span class="nv">$WORKDIR</span>/<span class="err">
+</span><span class="err"></span>COPY public <span class="nv">$WORKDIR</span>/<span class="err">
+</span><span class="err"></span>COPY src <span class="nv">$WORKDIR</span>/src<span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="k">EXPOSE</span><span class="s"> 8080</span><span class="err">
+</span><span class="err"></span><span class="k">CMD</span><span class="s"> yarn serve</span></code></pre></div>
+<h3 id="functionsのdockerfile">./functionsのDockerfile</h3>
+
+<p>./functions/Dockerfileと、./docker-comose.ymlを比較しながらご確認ください.</p>
+
+<ul>
+<li>WORKDIRを<code>/work/functions</code>とする</li>
+<li>./functions直下のファイルCOPYは、コピー元をプロジェクト直下からの相対パスで指定する</li>
+<li>プロジェクト直下のファイルCOPYは、コンテナの<code>/work</code>配下に設置する</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-Docker" data-lang="Docker"><span class="k">FROM</span><span class="s"> node:8-alpine</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="k">ENV</span><span class="s"> WORKDIR /work/functions</span><span class="err">
+</span><span class="err"></span><span class="k">WORKDIR</span><span class="s"> $WORKDIR</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span>COPY ./functions/package.json <span class="nv">$WORKDIR</span><span class="err">
+</span><span class="err"></span><span class="k">RUN</span> yarn<span class="err">
+</span><span class="err"></span><span class="c"># firebase</span><span class="err">
+</span><span class="err"></span><span class="k">RUN</span> yarn global add firebase-tools<span class="err">
+</span><span class="err">
+</span><span class="err"></span>COPY ./functions/tsconfig.json <span class="nv">$WORKDIR</span><span class="err">
+</span><span class="err"></span>COPY ./functions/lib <span class="nv">$WORKDIR</span>/lib<span class="err">
+</span><span class="err"></span>COPY ./functions/src <span class="nv">$WORKDIR</span>/src<span class="err">
+</span><span class="err"></span><span class="c"># for symbolic link (./functions/src/services/project-name)</span><span class="err">
+</span><span class="err"></span><span class="c"># COPY ./src/services/project-name /work/src/services/project-name</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="c"># firebase</span><span class="err">
+</span><span class="err"></span>COPY firebase.json /work<span class="err">
+</span><span class="err"></span>COPY .firebaserc /work<span class="err">
+</span><span class="err"></span><span class="c"># COPY ./functions/.runtimeconfig.json $WORKDIR # if needed</span><span class="err">
+</span><span class="err"></span><span class="c"># COPY ./functions/credentials $WORKDIR/credentials # if needed</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="c"># settings for runtime emulator</span><span class="err">
+</span><span class="err"></span><span class="k">ENV</span><span class="s"> HOST 0.0.0.0</span><span class="err">
+</span><span class="err"></span><span class="k">EXPOSE</span><span class="s"> 5000</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="k">EXPOSE</span><span class="s"> 9005</span></code></pre></div>
+<h3 id="プロジェクト直下のdocker-compose-yml">プロジェクト直下のdocker-compose.yml</h3>
+
+<ul>
+<li>上記Cloud FunctionsのDockerfileにあわせるため<code>build:</code>のcontext, dockerfileを別に指定する</li>
+<li>symbolic linkされている(プロジェクト直下にある)実体ファイルの変更もfunctions側のdockerに反映させるため、<code>./src:/work/src</code>を追加</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-Docker" data-lang="Docker">version: <span class="s1">&#39;3&#39;</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span>services:<span class="err">
+</span><span class="err"></span>    main:<span class="err">
+</span><span class="err"></span>        build: .<span class="err">
+</span><span class="err"></span>        container_name: front<span class="err">
+</span><span class="err"></span>        volumes:<span class="err">
+</span><span class="err"></span>            - ./public:/work/public<span class="err">
+</span><span class="err"></span>            - ./src:/work/src<span class="err">
+</span><span class="err"></span>        ports:<span class="err">
+</span><span class="err"></span>            - <span class="m">8080</span>:8080<span class="err">
+</span><span class="err"></span>        tty: true<span class="err">
+</span><span class="err"></span>        command: yarn serve<span class="err">
+</span><span class="err">
+</span><span class="err"></span>    functions:<span class="err">
+</span><span class="err"></span>        build:<span class="err">
+</span><span class="err"></span>            context: ./<span class="err">
+</span><span class="err"></span>            dockerfile: ./functions/Dockerfile<span class="err">
+</span><span class="err"></span>        container_name: functions<span class="err">
+</span><span class="err"></span>        volumes:<span class="err">
+</span><span class="err"></span>            - ./functions/lib:/work/functions/lib<span class="err">
+</span><span class="err"></span>            - ./functions/src:/work/functions/src<span class="err">
+</span><span class="err"></span>            - ./src:/work/src <span class="c1"># for symbolic link</span><span class="err">
+</span><span class="err"></span>        <span class="c1">#environment:</span><span class="err">
+</span><span class="err"></span>        <span class="c1">#    - GOOGLE_APPLICATION_CREDENTIALS=./credentials/firebase-adminsdk.json</span><span class="err">
+</span><span class="err"></span>        ports:<span class="err">
+</span><span class="err"></span>            - <span class="m">5000</span>:5000<span class="err">
+</span><span class="err"></span>            - <span class="m">9005</span>:9005<span class="err">
+</span><span class="err"></span>        tty: true</code></pre></div>
+<h2 id="開発の場合">開発の場合</h2>
+
+<p>開発環境立ち上げます</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ docker-compose build <span class="o">&amp;&amp;</span> docker-compose up</code></pre></div>
+<p>その後の開発は下記のようにすすめます</p>
+
+<h3 id="front">front</h3>
+
+<p><code>http://localhost:8080</code>にVue.jsプロジェクトがホットリロードされます</p>
+
+<h3 id="cloud-functions">Cloud Functions</h3>
+
+<p>こちらは多少面倒ではあります</p>
+
+<ol>
+<li>dockerコンテナに入る</li>
+<li>firebase loginしていなければfirebase loginを実施</li>
+<li>firebase serveやfirebase functions:shellなどでdebugging</li>
+</ol>
+
+<p>以下 <code>docker exec functions -it sh</code> してコンテナ内で</p>
+
+<pre><code>$ firebase login # if you are not logged in.
+$ firebase serve
+$ firebase functions:shell
+</code></pre>
+
+<p>Cloud Functionsのデバッグについてはまだペインが多いです..</p>
+
+<ul>
+<li><a href="https://firebase.google.com/docs/functions/local-shell?hl=ja">関数をインタラクティブにテストする(Firebase official)</a></li>
+</ul>
+
+<p>firebase loginの認証情報を永続化(都度<code>fireabase login</code>したくない)人は下記のサイトが参考になるかもしれません(試していません..)</p>
+
+<ul>
+<li><a href="https://qiita.com/pannpers/items/244a7e3c18d8c8422e4f">[Firebase] Cloud Functionsで消耗したくない人のために、開発環境のベストプラクティスをまとめていったらDockerに行き着いた話</a></li>
+</ul>
+
+<h2 id="deploy">deploy</h2>
+
+<ul>
+<li>github actions/ circleCIなど利用したほうがよいでしょう.</li>
+</ul>
+
+<h2 id="おわりに">おわりに</h2>
+
+<p>少し強引な形となってしまいましたが、Dockerの恩恵をうけることができる状態までできました.
+ただし、<code>./functions/Dockerfile</code>のフォルダのコンテキストが親階層直下にある点に気持ち悪さがあります.</p>
+
+<p>ここの気持ちわるさの解消は今後の課題とします.</p>
+
+  </section>
+</div>
+
+
+
+
+<footer>
+    <a href="https://dorakueyon.com/">© Yohei Iguchi 2019</a>
+</footer>
+</body>
+</html>
+

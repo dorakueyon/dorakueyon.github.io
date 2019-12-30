@@ -8,10 +8,273 @@
     <managingEditor>matthew.at.muse@gmail.com (Yohei Iguchi)</managingEditor>
     <webMaster>matthew.at.muse@gmail.com (Yohei Iguchi)</webMaster>
     <copyright>© Yohei Iguchi 2019</copyright>
-    <lastBuildDate>Sun, 29 Dec 2019 07:35:18 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 30 Dec 2019 09:05:09 +0900</lastBuildDate>
     
         <atom:link href="https://dorakueyon.com/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Firebase フロントエンド(Vue.js)/Cloud Functions を同一docker-composeで実行する際に感じたこと</title>
+      <link>https://dorakueyon.com/posts/2019/12/30/firebase-project-on-docker/</link>
+      <pubDate>Mon, 30 Dec 2019 09:05:09 +0900</pubDate>
+      <author>matthew.at.muse@gmail.com (Yohei Iguchi)</author>
+      <guid>https://dorakueyon.com/posts/2019/12/30/firebase-project-on-docker/</guid>
+      <description>
+
+&lt;h2 id=&#34;はじめに&#34;&gt;はじめに&lt;/h2&gt;
+
+&lt;p&gt;2019/12/30現在において、Firebaseを開発する際に生じる不都合の一つとして、node version管理があると思います.&lt;/p&gt;
+
+&lt;p&gt;Cloud Functionsの開発において、nodeのバージョンはversion8、あるいは10がサポートされています.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Cloud Functions ランタイムに関数をデプロイするには Firebase CLI が必要です。Node.js バージョン 8 と 10 がサポートされています。Node.js と npm をインストールする場合は、Node Version Manager をおすすめします。
+&lt;a href=&#34;https://firebase.google.com/docs/functions/get-started?hl=ja&#34;&gt;https://firebase.google.com/docs/functions/get-started?hl=ja&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;つまり、こんなことが頻発します.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;dorakueyon&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;% yarn build
+yarn run v1.19.2
+error functions@: The engine &lt;span class=&#34;s2&#34;&gt;&amp;#34;node&amp;#34;&lt;/span&gt; is incompatible with this module. Expected version &lt;span class=&#34;s2&#34;&gt;&amp;#34;8&amp;#34;&lt;/span&gt;. Got &lt;span class=&#34;s2&#34;&gt;&amp;#34;10.15.3&amp;#34;&lt;/span&gt;
+error Commands cannot run with an incompatible environment.
+info Visit https://yarnpkg.com/en/docs/cli/run &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; documentation about this command.&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;このように、異なるversionが依存する開発では、その依存性をDockerに閉じ込めることで幸せになれます.&lt;/p&gt;
+
+&lt;h2 id=&#34;vue-js-cloud-functionsのフォルダ構成&#34;&gt;Vue.js + Cloud Functionsのフォルダ構成&lt;/h2&gt;
+
+&lt;p&gt;Docker化する前に、プロジェクトを作成した上でフォルダ構成をみてみます.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Vue.js + Firebaseプロジェクト作成&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;$ vue create project-name
+$ firebase init&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;フォルダ構成 (node_modules配下を除いています)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;.
+├── README.md
+├── babel.config.js
+├── firebase.json
+├── functions
+│   ├── node_modules
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── src
+│   └── tsconfig.json
+├── node_modules
+├── package.json
+├── public
+│   ├── favicon.ico
+│   └── index.html
+├── src
+│   ├── App.vue
+│   ├── assets
+│   ├── components
+│   ├── main.ts
+│   ├── router
+│   ├── shims-tsx.d.ts
+│   ├── shims-vue.d.ts
+│   └── views
+├── tsconfig.json
+└── yarn.lock&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;FrontとCloud Functionsを開発する場合、プロジェクト直下と./funcions直下とで開発環境が分かれます.&lt;/p&gt;
+
+&lt;p&gt;それぞれにDockerfileを配置した上で、プロジェクト直下にdocker-compose.ymlを配置します.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Dockerファイルを追加したフォルダ構成 (node_modules配下を除いています)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;.
+├── Dockerfile &amp;lt;-
+├── README.md
+├── babel.config.js
+├── docker-compose.yml &amp;lt;-
+├── firebase.json
+├── functions
+│   ├── Dockerfile &amp;lt;-
+│   ├── node_modules
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── src
+│   │     ├── index.ts
+│   │     └── services
+│   │         └── project-name -&amp;gt; ../../../src/services/project-name &amp;lt;- シンボリックリンク
+│   └── tsconfig.json
+├── node_modules
+├── package.json
+├── public
+│   ├── favicon.ico
+│   └── index.html
+├── src
+│   ├── App.vue
+│   ├── assets
+│   ├── components
+│   ├── main.ts
+│   ├── router
+│   ├── services
+│   │   └── project-name &amp;lt;- シンボリックリンク先
+│   │       └── constants.ts
+│   ├── shims-tsx.d.ts
+│   ├── shims-vue.d.ts
+│   └── views
+├── tsconfig.json
+└── yarn.lock&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h2 id=&#34;docker化&#34;&gt;Docker化&lt;/h2&gt;
+
+&lt;p&gt;Docker化にむけて、下記の要件があります.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;プロジェクト直下のfirebase関連ファイル(firebase.json, .firebaserc)を、./functions側でも参照したい&lt;/li&gt;
+&lt;li&gt;./functions側からプロジェクト直下の定数やtypeをシンボリックリンクで参照する場合がある&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;上記を念頭に、&lt;code&gt;Dockerfile/docker-compose.yml&lt;/code&gt;を作成します.&lt;/p&gt;
+
+&lt;h3 id=&#34;プロジェクト直下のdockerfile&#34;&gt;プロジェクト直下のDockerfile&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;こちらは特に考えることはありません&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-Docker&#34; data-lang=&#34;Docker&#34;&gt;&lt;span class=&#34;k&#34;&gt;FROM&lt;/span&gt;&lt;span class=&#34;s&#34;&gt; node:12-alpine&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;ENV&lt;/span&gt;&lt;span class=&#34;s&#34;&gt; WORKDIR /work&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;WORKDIR&lt;/span&gt;&lt;span class=&#34;s&#34;&gt; $WORKDIR&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;COPY package.json &lt;span class=&#34;nv&#34;&gt;$WORKDIR&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;RUN&lt;/span&gt; yarn&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;COPY tsconfig.json &lt;span class=&#34;nv&#34;&gt;$WORKDIR&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;COPY *.config.js &lt;span class=&#34;nv&#34;&gt;$WORKDIR&lt;/span&gt;/&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;COPY public &lt;span class=&#34;nv&#34;&gt;$WORKDIR&lt;/span&gt;/&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;COPY src &lt;span class=&#34;nv&#34;&gt;$WORKDIR&lt;/span&gt;/src&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;EXPOSE&lt;/span&gt;&lt;span class=&#34;s&#34;&gt; 8080&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;CMD&lt;/span&gt;&lt;span class=&#34;s&#34;&gt; yarn serve&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h3 id=&#34;functionsのdockerfile&#34;&gt;./functionsのDockerfile&lt;/h3&gt;
+
+&lt;p&gt;./functions/Dockerfileと、./docker-comose.ymlを比較しながらご確認ください.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;WORKDIRを&lt;code&gt;/work/functions&lt;/code&gt;とする&lt;/li&gt;
+&lt;li&gt;./functions直下のファイルCOPYは、コピー元をプロジェクト直下からの相対パスで指定する&lt;/li&gt;
+&lt;li&gt;プロジェクト直下のファイルCOPYは、コンテナの&lt;code&gt;/work&lt;/code&gt;配下に設置する&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-Docker&#34; data-lang=&#34;Docker&#34;&gt;&lt;span class=&#34;k&#34;&gt;FROM&lt;/span&gt;&lt;span class=&#34;s&#34;&gt; node:8-alpine&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;ENV&lt;/span&gt;&lt;span class=&#34;s&#34;&gt; WORKDIR /work/functions&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;WORKDIR&lt;/span&gt;&lt;span class=&#34;s&#34;&gt; $WORKDIR&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;COPY ./functions/package.json &lt;span class=&#34;nv&#34;&gt;$WORKDIR&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;RUN&lt;/span&gt; yarn&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# firebase&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;RUN&lt;/span&gt; yarn global add firebase-tools&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;COPY ./functions/tsconfig.json &lt;span class=&#34;nv&#34;&gt;$WORKDIR&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;COPY ./functions/lib &lt;span class=&#34;nv&#34;&gt;$WORKDIR&lt;/span&gt;/lib&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;COPY ./functions/src &lt;span class=&#34;nv&#34;&gt;$WORKDIR&lt;/span&gt;/src&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# for symbolic link (./functions/src/services/project-name)&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# COPY ./src/services/project-name /work/src/services/project-name&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# firebase&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;COPY firebase.json /work&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;COPY .firebaserc /work&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# COPY ./functions/.runtimeconfig.json $WORKDIR # if needed&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# COPY ./functions/credentials $WORKDIR/credentials # if needed&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# settings for runtime emulator&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;ENV&lt;/span&gt;&lt;span class=&#34;s&#34;&gt; HOST 0.0.0.0&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;EXPOSE&lt;/span&gt;&lt;span class=&#34;s&#34;&gt; 5000&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;EXPOSE&lt;/span&gt;&lt;span class=&#34;s&#34;&gt; 9005&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h3 id=&#34;プロジェクト直下のdocker-compose-yml&#34;&gt;プロジェクト直下のdocker-compose.yml&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;上記Cloud FunctionsのDockerfileにあわせるため&lt;code&gt;build:&lt;/code&gt;のcontext, dockerfileを別に指定する&lt;/li&gt;
+&lt;li&gt;symbolic linkされている(プロジェクト直下にある)実体ファイルの変更もfunctions側のdockerに反映させるため、&lt;code&gt;./src:/work/src&lt;/code&gt;を追加&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-Docker&#34; data-lang=&#34;Docker&#34;&gt;version: &lt;span class=&#34;s1&#34;&gt;&amp;#39;3&amp;#39;&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;services:&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;    main:&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;        build: .&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;        container_name: front&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;        volumes:&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;            - ./public:/work/public&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;            - ./src:/work/src&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;        ports:&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;            - &lt;span class=&#34;m&#34;&gt;8080&lt;/span&gt;:8080&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;        tty: true&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;        command: yarn serve&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;    functions:&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;        build:&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;            context: ./&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;            dockerfile: ./functions/Dockerfile&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;        container_name: functions&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;        volumes:&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;            - ./functions/lib:/work/functions/lib&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;            - ./functions/src:/work/functions/src&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;            - ./src:/work/src &lt;span class=&#34;c1&#34;&gt;# for symbolic link&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;        &lt;span class=&#34;c1&#34;&gt;#environment:&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;        &lt;span class=&#34;c1&#34;&gt;#    - GOOGLE_APPLICATION_CREDENTIALS=./credentials/firebase-adminsdk.json&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;        ports:&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;            - &lt;span class=&#34;m&#34;&gt;5000&lt;/span&gt;:5000&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;            - &lt;span class=&#34;m&#34;&gt;9005&lt;/span&gt;:9005&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;        tty: true&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h2 id=&#34;開発の場合&#34;&gt;開発の場合&lt;/h2&gt;
+
+&lt;p&gt;開発環境立ち上げます&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;$ docker-compose build &lt;span class=&#34;o&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt; docker-compose up&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;その後の開発は下記のようにすすめます&lt;/p&gt;
+
+&lt;h3 id=&#34;front&#34;&gt;front&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;http://localhost:8080&lt;/code&gt;にVue.jsプロジェクトがホットリロードされます&lt;/p&gt;
+
+&lt;h3 id=&#34;cloud-functions&#34;&gt;Cloud Functions&lt;/h3&gt;
+
+&lt;p&gt;こちらは多少面倒ではあります&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;dockerコンテナに入る&lt;/li&gt;
+&lt;li&gt;firebase loginしていなければfirebase loginを実施&lt;/li&gt;
+&lt;li&gt;firebase serveやfirebase functions:shellなどでdebugging&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;以下 &lt;code&gt;docker exec functions -it sh&lt;/code&gt; してコンテナ内で&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ firebase login # if you are not logged in.
+$ firebase serve
+$ firebase functions:shell
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Cloud Functionsのデバッグについてはまだペインが多いです..&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://firebase.google.com/docs/functions/local-shell?hl=ja&#34;&gt;関数をインタラクティブにテストする(Firebase official)&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;firebase loginの認証情報を永続化(都度&lt;code&gt;fireabase login&lt;/code&gt;したくない)人は下記のサイトが参考になるかもしれません(試していません..)&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://qiita.com/pannpers/items/244a7e3c18d8c8422e4f&#34;&gt;[Firebase] Cloud Functionsで消耗したくない人のために、開発環境のベストプラクティスをまとめていったらDockerに行き着いた話&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;deploy&#34;&gt;deploy&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;github actions/ circleCIなど利用したほうがよいでしょう.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;おわりに&#34;&gt;おわりに&lt;/h2&gt;
+
+&lt;p&gt;少し強引な形となってしまいましたが、Dockerの恩恵をうけることができる状態までできました.
+ただし、&lt;code&gt;./functions/Dockerfile&lt;/code&gt;のフォルダのコンテキストが親階層直下にある点に気持ち悪さがあります.&lt;/p&gt;
+
+&lt;p&gt;ここの気持ちわるさの解消は今後の課題とします.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>1兆ドルコーチ から学ぶプロダクトマネージャーの姿勢</title>
@@ -444,14 +707,11 @@ trivial to implement.&amp;rdquo;&lt;/p&gt;
 &lt;p&gt;逆に、暗号化の長さとぴったり一緒の場合は、ブロック長のバイト数を、ブロック長回数分ファイル末尾に追加(padding)します. 例えばブロック長の長さが8byteで、ファイルの長さが8の倍数の場合(8, 16, 24&amp;hellip;)、0x08を8回となります&lt;/p&gt;
 
 &lt;p&gt;実装すると下記のような感じ.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;func PKCS5Padding(text []byte, blockSize int) []byte {
-	padding := blockSize - len(text) % blockSize //padingは上記でいうブロック長に足りない長さ.ちょうどの場合はブロック長
-	padtext := bytes.Repeat([]byte{byte(padding)}, padding)
-	return append(text, padtext...)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;PKCS5Padding&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;text&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[]&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;byte&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;blockSize&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[]&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;byte&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+	&lt;span class=&#34;nx&#34;&gt;padding&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;:=&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;blockSize&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;len&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;text&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;blockSize&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;//padingは上記でいうブロック長に足りない長さ.ちょうどの場合はブロック長
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;	&lt;span class=&#34;nx&#34;&gt;padtext&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;:=&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;bytes&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;Repeat&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;([]&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;byte&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;byte&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;padding&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)},&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;padding&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+	&lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;append&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;text&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;padtext&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;...&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;上記で前処理完了.&lt;/p&gt;
 
 &lt;h3 id=&#34;ecb&#34;&gt;ECB&lt;/h3&gt;
@@ -463,19 +723,16 @@ trivial to implement.&amp;rdquo;&lt;/p&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;の記事には、実装の手本がのっている.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-Go&#34;&gt;bs := block.BlockSize()
-if len(plaintext) % bs != 0 { //前処理をしていれば、ブロック長倍になっている
-  panic(&amp;quot;Need a multiple of the blocksize&amp;quot;)
-}
-ciphertext := make([]byte, len(plaintext))
-for len(plaintext) &amp;gt; 0 {
-  block.Encrypt(ciphertext, plaintext)
-  plaintext = plaintext[bs:]
-  ciphertext = ciphertext[bs:]
-}
-&lt;/code&gt;&lt;/pre&gt;
-
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-Go&#34; data-lang=&#34;Go&#34;&gt;&lt;span class=&#34;nx&#34;&gt;bs&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;:=&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;block&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;BlockSize&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+&lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;len&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;plaintext&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;bs&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;!=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;//前処理をしていれば、ブロック長倍になっている
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;nb&#34;&gt;panic&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;Need a multiple of the blocksize&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;nx&#34;&gt;ciphertext&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;:=&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;make&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;([]&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;byte&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;len&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;plaintext&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt;
+&lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;len&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;plaintext&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+  &lt;span class=&#34;nx&#34;&gt;block&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;Encrypt&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;ciphertext&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;plaintext&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+  &lt;span class=&#34;nx&#34;&gt;plaintext&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;plaintext&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;bs&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:]&lt;/span&gt;
+  &lt;span class=&#34;nx&#34;&gt;ciphertext&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;ciphertext&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;bs&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:]&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;ciphertext := make([]byte, len(plaintext))で暗号化前の文章のサイズ分の領域を作っておき、for文以下で、ブロック長文毎、暗号化を行なっていく.&lt;/p&gt;
 
 &lt;h3 id=&#34;つなげてみた&#34;&gt;つなげてみた&lt;/h3&gt;

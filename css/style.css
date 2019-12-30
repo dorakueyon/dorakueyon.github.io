@@ -255,6 +255,10 @@ code {
 	hyphens: none;
 }
 
+.chroma {
+	padding: 0.5em;
+}
+
 figcaption {
 	font-weight: 400;
 	font-style: italic;
@@ -271,7 +275,6 @@ blockquote {
     padding-left: 2em;
     font-style: italic;
     margin: 2em 0;
-
 }
 
 blockquote p {
@@ -282,3 +285,4 @@ blockquote p {
     font-size: 170%;
 	color: #848484;
 }
+

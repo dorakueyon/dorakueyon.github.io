@@ -22,6 +22,7 @@
 	
 	<meta name="article:tag" content="">
 	<link rel="stylesheet" type="text/css" href="https://dorakueyon.com/css/style.css">
+	<link rel="stylesheet" type="text/css" href="https://dorakueyon.com/css/syntax.css">
 	
 	
 <script type="application/javascript">
@@ -178,14 +179,11 @@ trivial to implement.&rdquo;</p>
 <p>逆に、暗号化の長さとぴったり一緒の場合は、ブロック長のバイト数を、ブロック長回数分ファイル末尾に追加(padding)します. 例えばブロック長の長さが8byteで、ファイルの長さが8の倍数の場合(8, 16, 24&hellip;)、0x08を8回となります</p>
 
 <p>実装すると下記のような感じ.</p>
-
-<pre><code class="language-go">func PKCS5Padding(text []byte, blockSize int) []byte {
-	padding := blockSize - len(text) % blockSize //padingは上記でいうブロック長に足りない長さ.ちょうどの場合はブロック長
-	padtext := bytes.Repeat([]byte{byte(padding)}, padding)
-	return append(text, padtext...)
-}
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">PKCS5Padding</span><span class="p">(</span><span class="nx">text</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">,</span> <span class="nx">blockSize</span> <span class="kt">int</span><span class="p">)</span> <span class="p">[]</span><span class="kt">byte</span> <span class="p">{</span>
+	<span class="nx">padding</span> <span class="o">:=</span> <span class="nx">blockSize</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="o">%</span> <span class="nx">blockSize</span> <span class="c1">//padingは上記でいうブロック長に足りない長さ.ちょうどの場合はブロック長
+</span><span class="c1"></span>	<span class="nx">padtext</span> <span class="o">:=</span> <span class="nx">bytes</span><span class="p">.</span><span class="nf">Repeat</span><span class="p">([]</span><span class="kt">byte</span><span class="p">{</span><span class="nb">byte</span><span class="p">(</span><span class="nx">padding</span><span class="p">)},</span> <span class="nx">padding</span><span class="p">)</span>
+	<span class="k">return</span> <span class="nb">append</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="nx">padtext</span><span class="o">...</span><span class="p">)</span>
+<span class="p">}</span></code></pre></div>
 <p>上記で前処理完了.</p>
 
 <h3 id="ecb">ECB</h3>
@@ -197,19 +195,16 @@ trivial to implement.&rdquo;</p>
 </ul>
 
 <p>の記事には、実装の手本がのっている.</p>
-
-<pre><code class="language-Go">bs := block.BlockSize()
-if len(plaintext) % bs != 0 { //前処理をしていれば、ブロック長倍になっている
-  panic(&quot;Need a multiple of the blocksize&quot;)
-}
-ciphertext := make([]byte, len(plaintext))
-for len(plaintext) &gt; 0 {
-  block.Encrypt(ciphertext, plaintext)
-  plaintext = plaintext[bs:]
-  ciphertext = ciphertext[bs:]
-}
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="nx">bs</span> <span class="o">:=</span> <span class="nx">block</span><span class="p">.</span><span class="nf">BlockSize</span><span class="p">()</span>
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">plaintext</span><span class="p">)</span> <span class="o">%</span> <span class="nx">bs</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span> <span class="c1">//前処理をしていれば、ブロック長倍になっている
+</span><span class="c1"></span>  <span class="nb">panic</span><span class="p">(</span><span class="s">&#34;Need a multiple of the blocksize&#34;</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="nx">ciphertext</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">byte</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nx">plaintext</span><span class="p">))</span>
+<span class="k">for</span> <span class="nb">len</span><span class="p">(</span><span class="nx">plaintext</span><span class="p">)</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+  <span class="nx">block</span><span class="p">.</span><span class="nf">Encrypt</span><span class="p">(</span><span class="nx">ciphertext</span><span class="p">,</span> <span class="nx">plaintext</span><span class="p">)</span>
+  <span class="nx">plaintext</span> <span class="p">=</span> <span class="nx">plaintext</span><span class="p">[</span><span class="nx">bs</span><span class="p">:]</span>
+  <span class="nx">ciphertext</span> <span class="p">=</span> <span class="nx">ciphertext</span><span class="p">[</span><span class="nx">bs</span><span class="p">:]</span>
+<span class="p">}</span></code></pre></div>
 <p>ciphertext := make([]byte, len(plaintext))で暗号化前の文章のサイズ分の領域を作っておき、for文以下で、ブロック長文毎、暗号化を行なっていく.</p>
 
 <h3 id="つなげてみた">つなげてみた</h3>
