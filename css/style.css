@@ -257,6 +257,8 @@ code {
 
 .chroma {
 	padding: 0.5em;
+	display: block;
+	overflow-x: auto;
 }
 
 figcaption {
