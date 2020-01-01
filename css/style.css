@@ -91,11 +91,6 @@ header {
 	padding: 0.5rem 0 0.5rem 0;
 }
 
-footer {
-	display:block;
-	padding: 0.5rem 0 5.5rem 0;
-}
-
 @media all and (max-width:520px) {
 	div.content {
 		padding: 40;
@@ -288,3 +283,24 @@ blockquote p {
 	color: #848484;
 }
 
+footer {
+	border-top:1px solid #e5e5e5;
+	padding-top:1.5em;
+	padding-bottom:1.5em;
+	margin-top:5em;
+	margin-bottom:3em;
+}
+
+footer > address > img {
+	border-radius: 54px;
+	width: 64px;
+	height: 64px;
+	margin: 0 20px 0 0;
+	display: inline-block;
+	margin-top: -28px;
+}
+
+footer > address > p {
+    margin: 0;
+    display: inline-block;
+}
