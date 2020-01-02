@@ -3,25 +3,43 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://dorakueyon.com/categories/</loc>
+    <lastmod>2020-01-02T09:22:40+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://dorakueyon.com/posts/2019/12/30/firebase-project-on-docker/</loc>
-    <lastmod>2019-12-30T12:06:39+09:00</lastmod>
+    <lastmod>2020-01-02T09:22:40+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://dorakueyon.com/posts/</loc>
-    <lastmod>2019-12-30T12:06:39+09:00</lastmod>
+    <lastmod>2020-01-02T09:22:40+09:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://dorakueyon.com/</loc>
-    <lastmod>2019-12-30T12:06:39+09:00</lastmod>
+    <lastmod>2020-01-02T09:22:40+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://dorakueyon.com/categories/tech/</loc>
+    <lastmod>2020-01-02T09:22:40+09:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://dorakueyon.com/posts/2019/12/29/trillion-doller-coach/</loc>
-    <lastmod>2019-12-29T08:50:53+09:00</lastmod>
+    <lastmod>2020-01-02T09:22:40+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://dorakueyon.com/categories/book/</loc>
+    <lastmod>2020-01-02T09:22:40+09:00</lastmod>
+    <priority>0</priority>
   </url>
   
   <url>
@@ -31,37 +49,38 @@
   
   <url>
     <loc>https://dorakueyon.com/posts/2018/09/09/startrust/</loc>
-    <lastmod>2018-09-09T20:53:00+09:00</lastmod>
+    <lastmod>2020-01-02T09:22:40+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://dorakueyon.com/posts/2018/08/13/subscribing-services-2018/</loc>
-    <lastmod>2018-08-15T00:28:58+09:00</lastmod>
+    <lastmod>2020-01-02T09:22:40+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://dorakueyon.com/categories/life/</loc>
+    <lastmod>2020-01-02T09:22:40+09:00</lastmod>
+    <priority>0</priority>
   </url>
   
   <url>
     <loc>https://dorakueyon.com/posts/2018/08/12/ecbwithgo/</loc>
-    <lastmod>2018-08-13T02:49:47+09:00</lastmod>
+    <lastmod>2020-01-02T09:22:40+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://dorakueyon.com/posts/2018/08/07/blockchainwithgo/</loc>
-    <lastmod>2018-08-07T23:26:41+09:00</lastmod>
+    <lastmod>2020-01-02T09:22:40+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://dorakueyon.com/posts/2018/07/24/hugogithuboriginaldomainssl/</loc>
-    <lastmod>2018-07-25T23:56:41+09:00</lastmod>
+    <lastmod>2020-01-02T09:22:40+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://dorakueyon.com/posts/2018/07/23/sample/</loc>
     <lastmod>2018-07-23T23:55:48+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://dorakueyon.com/categories/</loc>
-    <priority>0</priority>
   </url>
   
   <url>

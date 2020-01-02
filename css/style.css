@@ -283,11 +283,15 @@ blockquote p {
 	color: #848484;
 }
 
+.SingleArticle__Category {
+	margin-top:2em
+}
+
 footer {
 	border-top:1px solid #e5e5e5;
 	padding-top:1.5em;
 	padding-bottom:1.5em;
-	margin-top:5em;
+	margin-top:3em;
 	margin-bottom:3em;
 }
 
