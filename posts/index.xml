@@ -8,10 +8,40 @@
     <managingEditor>matthew.at.muse@gmail.com (Yohei Iguchi)</managingEditor>
     <webMaster>matthew.at.muse@gmail.com (Yohei Iguchi)</webMaster>
     <copyright>© Yohei Iguchi 2020</copyright>
-    <lastBuildDate>Mon, 06 Jan 2020 06:47:26 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 24 Sep 2020 23:09:51 +0900</lastBuildDate>
     
         <atom:link href="https://dorakueyon.com/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Rustでインタープリター</title>
+      <link>https://dorakueyon.com/posts/2020/09/24/rust-interpreter/</link>
+      <pubDate>Thu, 24 Sep 2020 23:09:51 +0900</pubDate>
+      <author>matthew.at.muse@gmail.com (Yohei Iguchi)</author>
+      <guid>https://dorakueyon.com/posts/2020/09/24/rust-interpreter/</guid>
+      <description>&lt;p&gt;インタープリターを作るなどしてRustを学びました.&lt;br /&gt;
+参考にさせていただいたのは&lt;a href=&#34;https://www.amazon.co.jp/Go%E8%A8%80%E8%AA%9E%E3%81%A7%E3%81%A4%E3%81%8F%E3%82%8B%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%97%E3%83%AA%E3%82%BF-Thorsten-Ball/dp/4873118220/ref=sr_1_1?__mk_ja_JP=%E3%82%AB%E3%82%BF%E3%82%AB%E3%83%8A&amp;amp;dchild=1&amp;amp;keywords=go+%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%97%E3%83%AA%E3%82%BF&amp;amp;qid=1600956806&amp;amp;sr=8-1&#34;&gt;Go言語でつくるインタプリタ&lt;/a&gt;、通称サル本です(僕が勝手に呼んでるだけ疑惑もあります)&lt;/p&gt;
+
+&lt;p&gt;レポジトリは下記になります.&lt;/p&gt;
+
+&lt;iframe
+  class=&#34;hatenablogcard&#34;
+  style=&#34;width:100%;height:155px;max-width:420px;&#34;
+  src=&#34;https://hatenablog-parts.com/embed?url=https%3a%2f%2fgithub.com%2fdorakueyon%2frust-mini-interpreter&#34;
+  title=&#34;&#34;
+  width=&#34;300&#34;
+  height=&#34;150&#34;
+  frameborder=&#34;0&#34;
+  scrolling=&#34;no&#34;&gt;
+&lt;/iframe&gt;
+
+
+&lt;p&gt;Rustで上記移植されている方は既にたくさんいらっしゃいます.&lt;br /&gt;
+今回は主にRustの学習が目的でした.&lt;/p&gt;
+
+&lt;p&gt;インタープリタは言語の学習にはよい題材だと思いました.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>プロダクトマネージメントと機能一覧という名の魔物</title>
